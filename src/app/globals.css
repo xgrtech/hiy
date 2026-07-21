@@ -36,28 +36,61 @@ body {
 }
 
 /* ---------- ambient gradient wash (all pages) ---------- */
-/* Fixed pseudo-element instead of background-attachment:fixed (janky on
-   iOS). Built from the accent TOKENS via color-mix, so a page that
-   overrides --accent (creator-branded twins via .wash) recolors its own
-   atmosphere. Intensities stay ≤11% — warmth, never contrast loss. */
+/* Grabient-style soft pastel wash: cool mist from one corner, peach→rose
+   flowing from the opposite one, a faint sage cross-current. Painted on a
+   fixed pseudo-element (background-attachment:fixed is janky on iOS).
+   Each page varies the ANGLE via a tiny marker class read with :has() —
+   browsers without :has() gracefully keep the default 225°. */
+:root {
+  --wash-peach: #f5d8c0;
+  --wash-rose: #eed3d0;
+  --wash-sage: #d7e5db;
+  --wash-mist: #d3dce4;
+}
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  --wa: 225deg;
   background:
-    radial-gradient(110% 85% at 88% -18%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 58%),
-    radial-gradient(95% 75% at -12% 22%, color-mix(in oklab, var(--accent-2) 7%, transparent), transparent 52%),
-    radial-gradient(130% 95% at 55% 118%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 58%);
+    linear-gradient(
+      var(--wa),
+      color-mix(in oklab, var(--wash-mist) 85%, transparent) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      calc(var(--wa) - 180deg),
+      color-mix(in oklab, var(--wash-peach) 90%, transparent) 0%,
+      color-mix(in oklab, var(--wash-rose) 55%, transparent) 36%,
+      transparent 64%
+    ),
+    linear-gradient(
+      calc(var(--wa) + 90deg),
+      color-mix(in oklab, var(--wash-sage) 45%, transparent) 0%,
+      transparent 52%
+    );
 }
-/* Opaque variant for containers that override --accent: covers the body
-   wash and repaints it in the local accent. */
+/* Per-page variants: a marker class anywhere in the page rotates the wash. */
+body:has(.wash-dawn)::before {
+  --wa: 150deg;
+  opacity: 0.6; /* dashboard: quieter, work surface */
+}
+body:has(.wash-dusk)::before {
+  --wa: 315deg;
+  opacity: 0.55; /* report page: subdued */
+}
+body:has(.wash-none)::before {
+  display: none; /* embed: respect the host site's background */
+}
+/* Creator-accented twin pages: opaque repaint in the LOCAL --accent (set
+   inline on main), same directional language as the global wash. */
 .wash {
   background:
-    radial-gradient(110% 85% at 88% -18%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 58%),
-    radial-gradient(95% 75% at -12% 22%, color-mix(in oklab, var(--accent-2) 7%, transparent), transparent 52%),
-    radial-gradient(130% 95% at 55% 118%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 58%),
+    linear-gradient(205deg, color-mix(in oklab, var(--accent) 13%, transparent), transparent 46%),
+    linear-gradient(25deg, color-mix(in oklab, var(--accent-2) 10%, transparent), transparent 44%),
+    linear-gradient(115deg, color-mix(in oklab, var(--accent) 6%, transparent), transparent 58%),
     var(--paper);
 }
 

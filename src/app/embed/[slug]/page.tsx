@@ -20,7 +20,7 @@ export default async function EmbedPage({
   if (!twin || twin.status !== "live") notFound();
 
   return (
-    <main className="p-3">
+    <main className="wash-none p-3">
       <div className="mb-2 flex items-center gap-2.5">
         {twin.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element

@@ -10,7 +10,13 @@ export const dynamic = "force-dynamic";
 export default async function AppPage() {
   const sb = await supabaseServer();
   const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) return <SignIn />;
+  if (!auth.user) {
+    return (
+      <div className="contents wash-dawn">
+        <SignIn />
+      </div>
+    );
+  }
 
   const db = supabaseAdmin();
   const { data: twin } = await db
@@ -21,7 +27,13 @@ export default async function AppPage() {
     .eq("owner_id", auth.user.id)
     .maybeSingle();
 
-  if (!twin) return <Onboard />;
+  if (!twin) {
+    return (
+      <div className="contents wash-dawn">
+        <Onboard />
+      </div>
+    );
+  }
 
   const [{ data: sources }, { data: wiki }] = await Promise.all([
     db
@@ -33,10 +45,12 @@ export default async function AppPage() {
   ]);
 
   return (
-    <Dashboard
-      twin={twin as TwinRecord}
-      sources={sources ?? []}
-      wiki={wiki?.markdown ?? null}
-    />
+    <div className="contents wash-dawn">
+      <Dashboard
+        twin={twin as TwinRecord}
+        sources={sources ?? []}
+        wiki={wiki?.markdown ?? null}
+      />
+    </div>
   );
 }
