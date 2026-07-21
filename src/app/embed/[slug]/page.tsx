@@ -14,7 +14,7 @@ export default async function EmbedPage({
   const db = supabaseAdmin();
   const { data: twin } = await db
     .from("twins")
-    .select("slug,name,suggested_questions,status")
+    .select("slug,name,greeting,avatar_url,suggested_questions,status")
     .eq("slug", slug)
     .single();
   if (!twin || twin.status !== "live") notFound();
@@ -22,7 +22,16 @@ export default async function EmbedPage({
   return (
     <main className="p-3">
       <div className="mb-2 flex items-center gap-2.5">
-        <div className="orb h-8 w-8" />
+        {twin.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={twin.avatar_url}
+            alt=""
+            className="h-8 w-8 rounded-full border border-line object-cover"
+          />
+        ) : (
+          <div className="orb h-8 w-8" />
+        )}
         <div>
           <p className="text-sm font-semibold leading-tight">{twin.name}&apos;s twin</p>
           <p className="text-[10px] text-inkfaint">AI twin — not the real person</p>
@@ -32,6 +41,8 @@ export default async function EmbedPage({
         slug={twin.slug}
         name={twin.name}
         suggested={((twin.suggested_questions as string[]) ?? []).slice(0, 2)}
+        greeting={twin.greeting}
+        avatarUrl={twin.avatar_url}
         compact
       />
       <p className="mt-2 text-center text-[10px] text-inkfaint">
