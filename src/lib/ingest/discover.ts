@@ -4,7 +4,7 @@
  * RSS/Atom fallback. Channel: youtubei.js listing. All fetching goes through
  * safeFetch (SSRF guard, size caps). Parsers are pure and fixture-tested.
  */
-import { INGEST_ERRORS } from "./errors";
+import { INGEST_ERRORS, IngestError } from "./errors";
 import { safeFetch } from "./net";
 
 export interface DiscoveredPage {
@@ -23,6 +23,22 @@ export interface DiscoveredVideo {
 const MAX_URLS = 500;
 const MAX_INDEX_DEPTH = 3;
 const MAX_CHILD_SITEMAPS = 10;
+// Whole-discovery wall clock: safeFetch retries can cost ~45s per slow host,
+// and the route's maxDuration is 120s — fail honestly before the platform
+// hard-kills the request.
+const DISCOVERY_BUDGET_MS = 90_000;
+
+async function withBudget<T>(work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(INGEST_ERRORS.fetchTimeout()), DISCOVERY_BUDGET_MS);
+  });
+  try {
+    return await Promise.race([work, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 /** `Sitemap:` declarations from a robots.txt body (case-insensitive). */
 export function parseRobotsSitemaps(robots: string): string[] {
@@ -111,7 +127,7 @@ async function expandSitemap(
   depth: number,
   seen: Set<string>
 ): Promise<DiscoveredPage[]> {
-  if (depth > MAX_INDEX_DEPTH || seen.has(url) || seen.size > MAX_CHILD_SITEMAPS) return [];
+  if (depth > MAX_INDEX_DEPTH || seen.has(url) || seen.size >= MAX_CHILD_SITEMAPS) return [];
   seen.add(url);
   const xml = await fetchText(url);
   if (!xml) return [];
@@ -132,6 +148,10 @@ async function expandSitemap(
 
 /** Discover importable pages for a site: sitemap first, feed fallback. */
 export async function discoverSite(rawUrl: string): Promise<DiscoveredPage[]> {
+  return withBudget(discoverSiteInner(rawUrl));
+}
+
+async function discoverSiteInner(rawUrl: string): Promise<DiscoveredPage[]> {
   let origin: string;
   try {
     origin = new URL(rawUrl).origin;
@@ -141,7 +161,19 @@ export async function discoverSite(rawUrl: string): Promise<DiscoveredPage[]> {
 
   const candidates: string[] = [];
   const robots = await fetchText(`${origin}/robots.txt`);
-  if (robots) candidates.push(...parseRobotsSitemaps(robots));
+  if (robots) {
+    // Confused-deputy guard: only follow sitemap declarations on the same
+    // origin — a hostile robots.txt must not point our fetcher elsewhere.
+    candidates.push(
+      ...parseRobotsSitemaps(robots).filter((u) => {
+        try {
+          return new URL(u).origin === origin;
+        } catch {
+          return false;
+        }
+      })
+    );
+  }
   candidates.push(`${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`);
 
   const seen = new Set<string>();
@@ -167,6 +199,10 @@ export async function discoverSite(rawUrl: string): Promise<DiscoveredPage[]> {
 
 /** List a YouTube channel's videos (no transcripts fetched here). */
 export async function discoverChannel(rawUrl: string): Promise<DiscoveredVideo[]> {
+  return withBudget(discoverChannelInner(rawUrl));
+}
+
+async function discoverChannelInner(rawUrl: string): Promise<DiscoveredVideo[]> {
   const { Innertube } = await import("youtubei.js");
   const yt = await Innertube.create({ retrieve_player: false });
 
@@ -214,7 +250,9 @@ export async function discoverChannel(rawUrl: string): Promise<DiscoveredVideo[]
     if (!out.length) throw INGEST_ERRORS.channelNoVideos();
     return out;
   } catch (e) {
-    if ((e as { code?: string }).code === "channel_no_videos") throw e;
+    // Keep honest failure modes (e.g. a future yt_blocked) instead of
+    // collapsing everything to "channel not found".
+    if (e instanceof IngestError) throw e;
     throw INGEST_ERRORS.channelNotFound();
   }
 }

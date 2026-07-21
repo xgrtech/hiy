@@ -187,7 +187,7 @@ export default function InterviewFlow({
             <p className="mt-2 text-xs text-inkfaint">
               Answer at least 3 questions first (
               <button
-                onClick={() => saveProgress(qa, 0)}
+                onClick={() => saveProgress([], 0)}
                 className="underline"
               >
                 start over

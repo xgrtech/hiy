@@ -8,7 +8,6 @@ import { INGEST_ERRORS, IngestError } from "./errors";
 import { cleanText, looksLikeText, wordCount } from "./clean";
 import { ingestBlogUrl } from "./blog";
 import { ingestYoutubeUrl, ingestYoutubePaste } from "./youtube";
-import { ingestFile } from "./files";
 import type { IngestedSource, SourceType } from "./types";
 
 export { IngestError, INGEST_ERRORS } from "./errors";

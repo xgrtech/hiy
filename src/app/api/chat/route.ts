@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { retrieve, buildSystemPrompt } from "@/lib/rag/engine";
+import { safePersona } from "@/lib/rag/persona";
 import { streamChat, activeChatProvider } from "@/lib/llm/provider";
 import { capsForTwin, checkAndCountMessage } from "@/lib/caps";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
@@ -85,7 +86,9 @@ export async function POST(req: NextRequest) {
     roleLine: twin.role_line,
     guardrailTopics: (twin.guardrail_topics as string[]) ?? [],
     chunks,
-    persona: twin.persona ?? null,
+    // jsonb from the DB is untrusted: a malformed row must degrade to the
+    // persona-less prompt, never 500 the public chat endpoint.
+    persona: safePersona(twin.persona),
   });
 
   const sources = [...new Set(chunks.filter((c) => c.similarity > 0.25).map((c) => c.source_title))].slice(0, 3);

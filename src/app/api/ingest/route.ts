@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
     let twinId: string;
     let ingested;
     let skipReindex = false;
+    let pendingFile: File | null = null;
+    let jsonReq: z.infer<typeof JsonBody> | null = null;
 
     if (contentType.includes("multipart/form-data")) {
       const form = await req.formData();
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
       if (!(file instanceof File)) {
         return Response.json({ error: "No file provided." }, { status: 400 });
       }
-      ingested = await ingestFile(file.name, Buffer.from(await file.arrayBuffer()));
+      pendingFile = file;
     } else {
       const parsed = JsonBody.safeParse(await req.json().catch(() => null));
       if (!parsed.success) {
@@ -62,10 +64,10 @@ export async function POST(req: NextRequest) {
       }
       twinId = parsed.data.twinId;
       skipReindex = parsed.data.skipReindex ?? false;
-      ingested = await ingest(parsed.data);
+      jsonReq = parsed.data;
     }
 
-    // ownership check (service client, explicit)
+    // ownership check BEFORE any expensive parsing/fetching
     const { data: twin } = await db
       .from("twins")
       .select("id, owner_id")
@@ -73,6 +75,15 @@ export async function POST(req: NextRequest) {
       .single();
     if (!twin || twin.owner_id !== auth.user.id) {
       return Response.json({ error: "Twin not found." }, { status: 404 });
+    }
+
+    if (pendingFile) {
+      ingested = await ingestFile(
+        pendingFile.name,
+        Buffer.from(await pendingFile.arrayBuffer())
+      );
+    } else {
+      ingested = await ingest(jsonReq!);
     }
 
     const caps = await capsForTwin(twinId);

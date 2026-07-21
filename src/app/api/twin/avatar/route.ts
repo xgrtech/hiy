@@ -65,6 +65,12 @@ export async function POST(req: NextRequest) {
   }
 
   const path = `${twinId}.${kind.ext}`;
+  // A replaced avatar with a different format would otherwise linger at its
+  // old public URL — remove the other-extension variants.
+  const stale = ["jpg", "png", "webp"]
+    .filter((ext) => ext !== kind.ext)
+    .map((ext) => `${twinId}.${ext}`);
+  await db.storage.from("avatars").remove(stale);
   const { error: upErr } = await db.storage
     .from("avatars")
     .upload(path, buf, { contentType: kind.mime, upsert: true });

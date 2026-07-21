@@ -93,15 +93,11 @@ export default function BulkImport({ twinId }: { twinId: string }) {
   async function runImport() {
     setPhase("importing");
     const queue = items.filter((i) => selected.has(i.key));
-    // Concurrency 2, polite and serverless-friendly.
-    let idx = 0;
-    async function worker() {
-      while (idx < queue.length) {
-        const item = queue[idx++];
-        await importOne(item);
-      }
+    // Sequential on purpose: the server's cap check is read-then-insert, so
+    // concurrent imports could race past the plan limits.
+    for (const item of queue) {
+      await importOne(item);
     }
-    await Promise.all([worker(), worker()]);
     try {
       await fetch("/api/twin/reindex", {
         method: "POST",

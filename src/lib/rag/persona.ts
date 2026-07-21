@@ -41,19 +41,32 @@ Return ONLY a JSON object with exactly these keys:
   "facts": ["first-person identity facts stated in interviews (empty if none)"]
 }
 
-Only include what the material supports — never invent. Interview answers are the highest-signal material. No text outside the JSON object.`;
+Only include what the material supports — never invent. Interview answers are the highest-signal material. Sources titled "[AUTHORITATIVE CORRECTION]" are fixes the person made later: where they conflict with anything else (including boundaries and facts), the correction wins. No text outside the JSON object.`;
 
-/** Build the synthesis input: interview sources first (highest signal). */
+/**
+ * Build the synthesis input: interviews first (highest signal), corrections
+ * last with an authoritative marker (they override everything before them).
+ */
 export function personaPromptInput(
   sources: { title: string; type: string; text: string }[]
 ): string {
-  const ranked = [...sources].sort(
-    (a, b) => Number(b.type === "interview") - Number(a.type === "interview")
-  );
-  return ranked
+  const ordered = [
+    ...sources.filter((s) => s.type === "interview"),
+    ...sources.filter((s) => s.type !== "interview" && s.type !== "correction"),
+    ...sources
+      .filter((s) => s.type === "correction")
+      .map((s) => ({ ...s, title: `[AUTHORITATIVE CORRECTION] ${s.title}` })),
+  ];
+  return ordered
     .map((s) => `### ${s.title} (${s.type})\n${s.text}`)
     .join("\n\n---\n\n")
     .slice(0, 150_000);
+}
+
+/** Validate an untrusted (e.g. DB jsonb) value into a PersonaProfile. */
+export function safePersona(raw: unknown): PersonaProfile | null {
+  const parsed = PersonaSchema.safeParse(raw);
+  return parsed.success ? parsed.data : null;
 }
 
 /** Render the persona block for the system prompt ("" when absent). */

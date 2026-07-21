@@ -8,7 +8,7 @@ import { z } from "zod";
 import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { discoverSite, discoverChannel } from "@/lib/ingest/discover";
 import { IngestError } from "@/lib/ingest";
-import { capsForTwin } from "@/lib/caps";
+import { capsForTwin, SOURCE_COUNT_EXEMPT } from "@/lib/caps";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const maxDuration = 120;
@@ -55,9 +55,7 @@ export async function POST(req: NextRequest) {
       .eq("twin_id", twinId);
     const rows = existing ?? [];
     const usedWords = rows.reduce((s, r) => s + (r.word_count ?? 0), 0);
-    const usedSources = rows.filter(
-      (r) => r.type !== "interview" && r.type !== "correction"
-    ).length;
+    const usedSources = rows.filter((r) => !SOURCE_COUNT_EXEMPT.has(r.type)).length;
 
     return Response.json({
       items,

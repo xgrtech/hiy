@@ -62,7 +62,10 @@ export async function checkAndCountMessage(twinId: string, caps: Caps): Promise<
 }
 
 /** Interview + correction sources count toward words but not source count. */
-const SOURCE_COUNT_EXEMPT = new Set(["interview", "correction"]);
+export const SOURCE_COUNT_EXEMPT: ReadonlySet<string> = new Set([
+  "interview",
+  "correction",
+]);
 
 export async function checkContentCaps(
   twinId: string,

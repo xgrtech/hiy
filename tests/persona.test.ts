@@ -68,6 +68,27 @@ async function main() {
     assert.ok(input.includes("Q: A?"));
   });
 
+  await test("personaPromptInput puts corrections last with authoritative marker", () => {
+    const input = personaPromptInput([
+      { title: "Fix", type: "correction", text: "I left Acme in 2024." },
+      { title: "Blog post", type: "blog", text: "blog words" },
+      { title: "Personality interview", type: "interview", text: "Q: A?\nA: B" },
+    ]);
+    assert.ok(input.includes("[AUTHORITATIVE CORRECTION] Fix"));
+    assert.ok(
+      input.indexOf("Blog post") < input.indexOf("[AUTHORITATIVE CORRECTION]"),
+      "corrections should come after other sources"
+    );
+  });
+
+  const { safePersona } = await import("../src/lib/rag/persona");
+  await test("safePersona validates untrusted jsonb (null on malformed)", () => {
+    assert.ok(safePersona(validPersona));
+    assert.equal(safePersona({ tone: "not-an-array" }), null);
+    assert.equal(safePersona(null), null);
+    assert.equal(safePersona("junk"), null);
+  });
+
   // ---------- prompt.ts ----------
   const { buildSystemPrompt } = await import("../src/lib/rag/prompt");
   console.log("prompt.ts");
