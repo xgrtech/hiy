@@ -276,6 +276,15 @@ trailer<</Root 1 0 R>>`;
     }
     assert.equal(code, "text_too_short");
   });
+  await test("correction routes like manual with default title, no min-words gate", async () => {
+    const src = await ingest({
+      sourceType: "correction",
+      payload: "Actually I left Acme in 2024, not 2023.",
+    });
+    assert.equal(src.type, "correction");
+    assert.equal(src.title, "Correction");
+    assert.ok(src.wordCount > 0);
+  });
 
   console.log(`\n${passed} passed, ${failed} failed`);
   process.exit(failed ? 1 : 0);

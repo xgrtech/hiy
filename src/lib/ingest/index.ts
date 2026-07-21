@@ -17,6 +17,8 @@ export { ingestFile } from "./files";
 export { extractVideoId } from "./youtube";
 
 const MIN_MANUAL_WORDS = 30;
+// A one-line fix ("I left Acme in 2024, not 2023") is a valid correction.
+const MIN_CORRECTION_WORDS = 5;
 const MAX_TEXT_CHARS = 2_000_000; // ~300k words; caps enforce real limits per-tier
 
 export interface IngestRequest {
@@ -28,21 +30,26 @@ export interface IngestRequest {
   videoRef?: string;
 }
 
+const DEFAULT_TITLES = {
+  manual: "Pasted text",
+  linkedin: "LinkedIn / résumé",
+  correction: "Correction",
+} as const;
+
 function ingestManual(
   payload: string,
   title: string | undefined,
-  type: "manual" | "linkedin"
+  type: keyof typeof DEFAULT_TITLES
 ): IngestedSource {
   if (!looksLikeText(payload)) throw INGEST_ERRORS.fileCorrupt();
   const text = cleanText(payload).slice(0, MAX_TEXT_CHARS);
-  if (wordCount(text) < MIN_MANUAL_WORDS) {
-    throw INGEST_ERRORS.textTooShort(MIN_MANUAL_WORDS);
+  const minWords = type === "correction" ? MIN_CORRECTION_WORDS : MIN_MANUAL_WORDS;
+  if (wordCount(text) < minWords) {
+    throw INGEST_ERRORS.textTooShort(minWords);
   }
   return {
     type,
-    title:
-      title?.trim() ||
-      (type === "linkedin" ? "LinkedIn / résumé" : "Pasted text"),
+    title: title?.trim() || DEFAULT_TITLES[type],
     url: null,
     text,
     wordCount: wordCount(text),
@@ -57,6 +64,8 @@ export async function ingest(req: IngestRequest): Promise<IngestedSource> {
   switch (req.sourceType) {
     case "manual":
       return ingestManual(payload, req.title, "manual");
+    case "correction":
+      return ingestManual(payload, req.title, "correction");
     case "linkedin":
       // No live scraping (LinkedIn ToS + fragility). "LinkedIn" is the
       // creator's own exported profile / résumé text, pasted.

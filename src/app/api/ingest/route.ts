@@ -11,10 +11,12 @@ export const maxDuration = 120;
 
 const JsonBody = z.object({
   twinId: z.string().uuid(),
-  sourceType: z.enum(["manual", "linkedin", "blog", "youtube"]),
+  sourceType: z.enum(["manual", "linkedin", "blog", "youtube", "correction"]),
   payload: z.string().min(1).max(2_100_000),
   title: z.string().max(200).optional(),
   videoRef: z.string().max(500).optional(),
+  /** Batch imports: skip the per-source reindex; caller reindexes once at the end. */
+  skipReindex: z.boolean().optional(),
 });
 
 function errResponse(e: unknown) {
@@ -43,6 +45,7 @@ export async function POST(req: NextRequest) {
   try {
     let twinId: string;
     let ingested;
+    let skipReindex = false;
 
     if (contentType.includes("multipart/form-data")) {
       const form = await req.formData();
@@ -58,6 +61,7 @@ export async function POST(req: NextRequest) {
         return Response.json({ error: "Invalid request." }, { status: 400 });
       }
       twinId = parsed.data.twinId;
+      skipReindex = parsed.data.skipReindex ?? false;
       ingested = await ingest(parsed.data);
     }
 
@@ -72,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     const caps = await capsForTwin(twinId);
-    const capCheck = await checkContentCaps(twinId, ingested.wordCount, caps);
+    const capCheck = await checkContentCaps(twinId, ingested.wordCount, caps, ingested.type);
     if (capCheck !== "ok") {
       return Response.json(
         {
@@ -100,6 +104,11 @@ export async function POST(req: NextRequest) {
       .select("id,title,type,word_count")
       .single();
     if (error) throw error;
+
+    if (skipReindex) {
+      // Batch import: caller hits /api/twin/reindex once after the last item.
+      return Response.json({ source, numChunks: 0 });
+    }
 
     await db.from("twins").update({ status: "indexing" }).eq("id", twinId);
     const numChunks = await reindexTwin(twinId);

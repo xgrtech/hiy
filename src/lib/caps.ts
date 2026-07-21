@@ -61,18 +61,24 @@ export async function checkAndCountMessage(twinId: string, caps: Caps): Promise<
   return true;
 }
 
+/** Interview + correction sources count toward words but not source count. */
+const SOURCE_COUNT_EXEMPT = new Set(["interview", "correction"]);
+
 export async function checkContentCaps(
   twinId: string,
   addingWords: number,
-  caps: Caps
+  caps: Caps,
+  addingType?: string
 ): Promise<"ok" | "words" | "sources"> {
   const db = supabaseAdmin();
   const { data } = await db
     .from("sources")
-    .select("word_count")
+    .select("word_count,type")
     .eq("twin_id", twinId);
   const sources = data ?? [];
-  if (sources.length + 1 > caps.max_sources) return "sources";
+  const counted = sources.filter((r) => !SOURCE_COUNT_EXEMPT.has(r.type)).length;
+  const addsToCount = addingType ? !SOURCE_COUNT_EXEMPT.has(addingType) : true;
+  if (counted + (addsToCount ? 1 : 0) > caps.max_sources) return "sources";
   const total = sources.reduce((s, r) => s + (r.word_count ?? 0), 0);
   if (total + addingWords > caps.max_words) return "words";
   return "ok";
