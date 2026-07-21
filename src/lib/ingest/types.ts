@@ -3,7 +3,9 @@ export type SourceType =
   | "linkedin"
   | "blog"
   | "youtube"
-  | "file";
+  | "file"
+  | "interview"
+  | "correction";
 
 export interface IngestedSource {
   type: SourceType;
