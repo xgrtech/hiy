@@ -4,7 +4,10 @@ import { createServerClient } from "@supabase/ssr";
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") ?? "/app";
+  // Only allow same-origin paths: must start with a single "/" (blocks
+  // "https://…", "//host" and "/\host" open-redirect forms).
+  const nextParam = url.searchParams.get("next") ?? "/app";
+  const next = /^\/(?![/\\])/.test(nextParam) ? nextParam : "/app";
 
   if (code) {
     const res = NextResponse.redirect(new URL(next, url.origin));
