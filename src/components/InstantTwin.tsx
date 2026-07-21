@@ -39,14 +39,12 @@ export default function InstantTwin() {
   return (
     <div className="arch arch-shadow relative mx-auto w-full max-w-[380px] overflow-hidden border border-line bg-surface">
       {/* dome: the twin taking shape */}
-      <div className="flex flex-col items-center bg-[radial-gradient(120%_100%_at_50%_0%,#e4ede9_0%,transparent_70%)] px-8 pb-5 pt-14">
-        <div className={`orb h-24 w-24 ${busy ? "orb--thinking" : ""}`} />
+      <div className="dome flex flex-col items-center px-8 pb-4 pt-12">
+        <div className={`orb h-28 w-28 ${busy ? "orb--thinking" : ""}`} />
         <p className="font-display mt-4 text-xl font-medium">
           {name.trim() ? `${name.trim()}'s twin` : "Your twin"}
         </p>
-        <p className="mt-0.5 text-xs text-inkfaint">
-          born in ~30 seconds · no account · lasts 24h
-        </p>
+        <p className="mt-0.5 text-xs text-inkfaint">≈30 seconds · no account</p>
       </div>
 
       <div className="px-6 pb-6">

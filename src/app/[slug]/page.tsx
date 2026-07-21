@@ -98,8 +98,8 @@ export default async function TwinPage({
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center bg-[radial-gradient(120%_100%_at_50%_0%,var(--accent-soft)_0%,transparent_70%)] px-6 pb-4 pt-14 text-center">
-                <div className="orb h-24 w-24" />
+              <div className="dome flex flex-col items-center px-6 pb-4 pt-12 text-center">
+                <div className="orb h-28 w-28" />
                 <h1 className="font-display mt-4 text-3xl font-medium">{twin.name}</h1>
                 {twin.role_line && (
                   <p className="mt-0.5 text-sm text-inksoft">{twin.role_line}</p>

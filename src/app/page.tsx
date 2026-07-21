@@ -55,10 +55,9 @@ export default function Landing() {
             <InstantTwin />
           </div>
 
-          <h1 className="font-display mx-auto mt-12 max-w-3xl text-center text-[clamp(2.6rem,6vw,4.6rem)] font-medium leading-[1.04] tracking-[-0.02em] [text-wrap:balance]">
-            <span className="text-inksoft">A twin that talks like you —</span>
-            <br />
-            and knows when it doesn&apos;t know.
+          <h1 className="font-display mx-auto mt-12 max-w-3xl text-center text-[clamp(2.1rem,4vw,3.3rem)] font-medium leading-[1.08] tracking-[-0.02em] [text-wrap:balance]">
+            <span className="text-inksoft">A twin that talks like you —</span>{" "}
+            <span className="block">and knows when it doesn&apos;t know.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-inksoft">
             Point hiy at your writing, talks, and videos. Get a twin that answers

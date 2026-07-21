@@ -37,14 +37,14 @@ export default function Onboard() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-10">
       <div className="arch arch-shadow w-full max-w-md overflow-hidden border border-line bg-surface">
-        <div className="flex flex-col items-center bg-[radial-gradient(120%_100%_at_50%_0%,#e4ede9_0%,transparent_70%)] px-8 pb-2 pt-12 text-center">
-          <div className="orb mb-4 h-16 w-16" />
+        <div className="dome flex flex-col items-center px-8 pb-4 pt-11 text-center">
+          <div className="orb mb-4 h-20 w-20" />
           <h1 className="font-display text-2xl font-medium">Claim your twin</h1>
           <p className="mt-1.5 text-sm text-inksoft">
             Pick your public URL — this is where people will meet your twin.
           </p>
         </div>
-        <div className="px-8 pb-8">
+        <div className="px-8 pb-8 pt-2">
         <div className="mt-5 flex items-center rounded-xl border border-line bg-paper px-4 py-2.5 text-sm focus-within:border-accent">
           <span className="text-inkfaint">hiy.ai/</span>
           <input
