@@ -286,6 +286,78 @@ trailer<</Root 1 0 R>>`;
     assert.ok(src.wordCount > 0);
   });
 
+  // ---------- discover.ts ----------
+  const { parseRobotsSitemaps, parseSitemapXml, parseRssXml } = await import(
+    "../src/lib/ingest/discover"
+  );
+  console.log("discover.ts");
+
+  await test("robots.txt sitemap lines extracted (case-insensitive)", () => {
+    const robots = `User-agent: *\nDisallow: /admin\nSitemap: https://ex.com/sitemap.xml\nsitemap: https://ex.com/news.xml`;
+    assert.deepEqual(parseRobotsSitemaps(robots), [
+      "https://ex.com/sitemap.xml",
+      "https://ex.com/news.xml",
+    ]);
+  });
+
+  await test("urlset sitemap → items with loc + lastmod", () => {
+    const xml = `<?xml version="1.0"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://ex.com/post-1</loc><lastmod>2026-01-01</lastmod></url>
+  <url><loc>https://ex.com/post-2</loc></url>
+</urlset>`;
+    const out = parseSitemapXml(xml);
+    assert.equal(out.kind, "urlset");
+    assert.equal(out.items.length, 2);
+    assert.equal(out.items[0].url, "https://ex.com/post-1");
+    assert.equal(out.items[0].lastmod, "2026-01-01");
+    assert.equal(out.items[1].lastmod, null);
+  });
+
+  await test("sitemap index → child sitemap URLs", () => {
+    const xml = `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://ex.com/posts.xml</loc></sitemap>
+  <sitemap><loc>https://ex.com/pages.xml</loc></sitemap>
+</sitemapindex>`;
+    const out = parseSitemapXml(xml);
+    assert.equal(out.kind, "index");
+    assert.deepEqual(out.items.map((i) => i.url), [
+      "https://ex.com/posts.xml",
+      "https://ex.com/pages.xml",
+    ]);
+  });
+
+  await test("malformed sitemap XML → feed_invalid", () => {
+    let code = "";
+    try {
+      parseSitemapXml("<html><body>not a sitemap</body></html>");
+    } catch (e) {
+      code = (e as { code?: string }).code ?? "";
+    }
+    assert.equal(code, "feed_invalid");
+  });
+
+  await test("RSS feed → items with title + link (CDATA tolerated)", () => {
+    const xml = `<rss version="2.0"><channel><title>Blog</title>
+  <item><title><![CDATA[First & best post]]></title><link>https://ex.com/a</link><pubDate>Mon, 01 Jan 2026 00:00:00 GMT</pubDate></item>
+  <item><title>Second</title><link>https://ex.com/b</link></item>
+</channel></rss>`;
+    const out = parseRssXml(xml);
+    assert.equal(out.length, 2);
+    assert.equal(out[0].title, "First & best post");
+    assert.equal(out[0].url, "https://ex.com/a");
+  });
+
+  await test("Atom feed → entries via link href", () => {
+    const xml = `<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>Atom post</title><link href="https://ex.com/atom-1"/><updated>2026-02-02</updated></entry>
+</feed>`;
+    const out = parseRssXml(xml);
+    assert.equal(out.length, 1);
+    assert.equal(out[0].url, "https://ex.com/atom-1");
+    assert.equal(out[0].title, "Atom post");
+  });
+
   console.log(`\n${passed} passed, ${failed} failed`);
   process.exit(failed ? 1 : 0);
 }

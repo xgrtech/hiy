@@ -22,7 +22,12 @@ export type IngestErrorCode =
   | "file_corrupt"
   | "file_empty"
   | "text_too_short"
-  | "cap_exceeded"; // tier content/input caps
+  | "cap_exceeded" // tier content/input caps
+  | "sitemap_not_found"
+  | "sitemap_too_large"
+  | "feed_invalid"
+  | "channel_not_found"
+  | "channel_no_videos";
 
 export class IngestError extends Error {
   readonly code: IngestErrorCode;
@@ -120,5 +125,31 @@ export const INGEST_ERRORS = {
       kind === "words"
         ? "This would exceed your plan's training-content limit."
         : "You've reached your plan's source limit."
+    ),
+  sitemapNotFound: () =>
+    new IngestError(
+      "sitemap_not_found",
+      "We couldn't find a sitemap or feed for that site. Try adding individual post URLs instead."
+    ),
+  sitemapTooLarge: () =>
+    new IngestError(
+      "sitemap_too_large",
+      "That sitemap is too large to process. Try a more specific sitemap URL (e.g. your posts sitemap)."
+    ),
+  feedInvalid: () =>
+    new IngestError(
+      "feed_invalid",
+      "That sitemap or feed couldn't be parsed. Try adding individual post URLs instead."
+    ),
+  channelNotFound: () =>
+    new IngestError(
+      "channel_not_found",
+      "We couldn't find that YouTube channel. Paste the channel URL (youtube.com/@yourhandle).",
+      true
+    ),
+  channelNoVideos: () =>
+    new IngestError(
+      "channel_no_videos",
+      "That channel has no public videos we can read."
     ),
 } as const;

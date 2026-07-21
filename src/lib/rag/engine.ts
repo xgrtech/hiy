@@ -59,7 +59,12 @@ export async function reindexTwin(twinId: string): Promise<number> {
     .eq("twin_id", twinId)
     .order("created_at");
   if (error) throw error;
-  if (!sources?.length) return 0;
+  if (!sources?.length) {
+    // Last source deleted: clear the derived state too.
+    await db.from("chunks").delete().eq("twin_id", twinId);
+    await db.from("wikis").delete().eq("twin_id", twinId);
+    return 0;
+  }
 
   // Corrections go last with an authoritative marker so the synthesizer
   // applies them over conflicting source material.
