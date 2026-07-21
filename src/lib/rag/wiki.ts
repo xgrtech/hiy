@@ -3,7 +3,9 @@ import { activeChatProvider, completeText } from "@/lib/llm/provider";
 
 const SYSTEM = `You are building a structured personal knowledge base ("wiki") about a specific person from raw source material they provided about themselves (blog posts, video transcripts, résumé text, notes).
 
-Rewrite and organize it into clean markdown with topic headings adapted to the material (e.g. Background, Work, Projects, Opinions & Takes, How They Talk, Stories & Anecdotes). Preserve first-person facts, specific details, anecdotes, and distinctive phrases/opinions verbatim where possible — these make the eventual twin sound like the real person. Never invent facts not supported by the sources. No editorializing.`;
+Rewrite and organize it into clean markdown with topic headings adapted to the material (e.g. Background, Work, Projects, Opinions & Takes, How They Talk, Stories & Anecdotes). Preserve first-person facts, specific details, anecdotes, and distinctive phrases/opinions verbatim where possible — these make the eventual twin sound like the real person. Never invent facts not supported by the sources. No editorializing.
+
+Sources titled "[AUTHORITATIVE CORRECTION]" are fixes the person made to their own knowledge base: where they conflict with other material, the correction wins — apply it and drop the outdated claim.`;
 
 export async function synthesizeWiki(
   sources: { title: string; type: string; text: string }[]

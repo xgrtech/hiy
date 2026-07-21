@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const db = supabaseAdmin();
   const { data: twin } = await db
     .from("twins")
-    .select("id,name,role_line,guardrail_topics,status,is_ephemeral,expires_at")
+    .select("id,name,role_line,guardrail_topics,persona,status,is_ephemeral,expires_at")
     .eq("slug", slug)
     .single();
   if (!twin || (twin.status !== "live" && !twin.is_ephemeral)) {
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
     roleLine: twin.role_line,
     guardrailTopics: (twin.guardrail_topics as string[]) ?? [],
     chunks,
+    persona: twin.persona ?? null,
   });
 
   const sources = [...new Set(chunks.filter((c) => c.similarity > 0.25).map((c) => c.source_title))].slice(0, 3);
