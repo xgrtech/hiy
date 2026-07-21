@@ -107,6 +107,41 @@ async function main() {
     assert.ok(rulesIdx < personaIdx, "rules come before persona style");
   });
 
+  // ---------- interview/format.ts ----------
+  const { qaToTranscript, qaBoundaries } = await import(
+    "../src/lib/interview/format"
+  );
+  const { SEED_QUESTIONS } = await import("../src/lib/interview/questions");
+  console.log("interview");
+
+  await test("qaToTranscript renders answered pairs, drops empty answers", () => {
+    const t = qaToTranscript([
+      { q: "How do you greet people?", a: "Hey! Always informal." },
+      { q: "Skipped one", a: "" },
+    ]);
+    assert.ok(t.includes("Q: How do you greet people?"));
+    assert.ok(t.includes("A: Hey! Always informal."));
+    assert.ok(!t.includes("Skipped one"));
+  });
+
+  await test("qaBoundaries extracts answers to boundary-group questions", () => {
+    const boundaryQ = SEED_QUESTIONS.find((q) => q.group === "boundaries")!;
+    const out = qaBoundaries([
+      { q: boundaryQ.text, a: "My family, and my clients' names" },
+      { q: "How do you greet people?", a: "Hey!" },
+    ]);
+    assert.deepEqual(out, ["My family, and my clients' names"]);
+  });
+
+  await test("seed bank has 5 groups and enough questions", () => {
+    const groups = new Set(SEED_QUESTIONS.map((q) => q.group));
+    assert.deepEqual(
+      [...groups].sort(),
+      ["bio", "boundaries", "faqs", "opinions", "voice"]
+    );
+    assert.ok(SEED_QUESTIONS.length >= 15);
+  });
+
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);
 }
