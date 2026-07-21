@@ -33,28 +33,32 @@ to keyword retrieval. Without the service-role key, no DB-backed route works.
 ## Tests
 
 ```bash
-npx tsx tests/ingest.test.ts   # ingestion suite — 29 tests, all passing
-npm run build                  # type-checks and compiles all 12 routes
+npx tsx tests/ingest.test.ts   # ingestion + discovery suite — 36 tests
+npx tsx tests/persona.test.ts  # persona + prompt + interview suite — 13 tests
+npm run build                  # type-checks and compiles all routes
 ```
 
 ## Repository map
 
 ```
-supabase/migrations/   Schema (2 migrations — ALREADY APPLIED to the live
+supabase/migrations/   Schema (3 migrations — ALREADY APPLIED to the live
                        project pbkdokxafuoiagvjeigm; kept for versioning /
                        replaying onto a fresh or local Supabase)
-src/lib/ingest/        Ingestion library (the hardened part — see docs)
-src/lib/rag/           Wiki synthesis, chunking, pgvector retrieval, prompts
+src/lib/ingest/        Ingestion library incl. bulk discovery (hardened — see docs)
+src/lib/rag/           Wiki synthesis, chunking, retrieval, prompt, persona
+src/lib/interview/     Personality-interview question bank + formatting
 src/lib/llm/           Provider-agnostic LLM + embeddings (AI SDK)
 src/lib/caps.ts        Tier caps enforcement (billing deferred by design)
 src/lib/ratelimit.ts   Best-effort burst limiter for public endpoints
-src/app/api/           chat (streaming) · ingest · instant · twin · report
-src/app/               landing · /[slug] public twin · /embed/[slug] ·
-                       /app dashboard · /report/[slug] · /auth/callback
-src/components/        InstantTwin · TwinChat · SignIn · Onboard · Dashboard
+src/app/api/           chat · ingest · instant · discover · interview (+gaps) ·
+                       source · twin (+profile · avatar · reindex) · report
+src/app/               landing · /[slug] public twin (?q= deep links) ·
+                       /embed/[slug] · /app dashboard · /report/[slug]
+src/components/        TwinChat · InterviewFlow · Dashboard (5 tabs in
+                       dashboard/) · InstantTwin · SignIn · Onboard
 public/embed.js        Inline-embed loader script (lazy iframe)
-tests/                 Ingestion test suite
-docs/                  SETUP.md · DEVELOPMENT.md · DEPLOY.md
+tests/                 Ingestion + persona test suites
+docs/                  SETUP.md · DEVELOPMENT.md · DEPLOY.md · superpowers/
 ```
 
 ## Documentation

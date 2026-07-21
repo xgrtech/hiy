@@ -77,17 +77,43 @@ The orb, doodles, springs, blobs, and reveals are utility classes
 (`.orb`, `.doodle-path`, `.bubble-in`, `.blob`, `.reveal`) — reduced-motion
 is respected globally.
 
+## Phase 1 additions (twin quality — spec in docs/superpowers/specs/)
+
+- **Personality interview** (`src/lib/interview/`, `/api/interview`,
+  Refine tab): seed bank (18 questions, 5 groups) + LLM gap questions from
+  the wiki (`/api/interview/gaps`). Sessions become `interview` sources;
+  boundary answers merge into `guardrail_topics`.
+- **Persona** (`src/lib/rag/persona.ts` pure + `synthesizePersona` in
+  engine): jsonb profile on `twins`, injected as a "HOW YOU SPEAK" block by
+  `src/lib/rag/prompt.ts` (buildSystemPrompt moved there, re-exported from
+  engine). Persona shapes style, never facts.
+- **Corrections**: `correction` sources (min 5 words) rank authoritative in
+  wiki synthesis; added from the Knowledge tab next to the read-only wiki
+  viewer.
+- **Bulk import** (`src/lib/ingest/discover.ts`, `/api/discover`): sitemap
+  (robots.txt → sitemap.xml → index recursion) and RSS/Atom fallback for
+  sites; youtubei.js listing for channels. Client imports sequentially with
+  `skipReindex` then hits `/api/twin/reindex` once.
+- **Profile/behavior editing** (`/api/twin/profile` PATCH, `/api/twin/avatar`
+  POST): name/role/bio/links/greeting/questions/guardrails/accent; avatars
+  magic-byte-sniffed, ≤2MB, public `avatars` bucket.
+- **Public page**: avatar hero, bio, links, `?q=` deep links (auto-ask),
+  per-message Sources panel, dashed-border treatment for honest
+  "I don't know" replies. Caps: interview/correction sources are exempt
+  from `max_sources` (still count toward `max_words`).
+
 ## Honest status: verified vs not
 
-**Verified:** ingestion suite (29/29) · full TS build (12 routes) · schema
-applied to live project + security advisors clean.
+**Verified:** ingestion + discovery suite (36/36) · persona/interview suite
+(13/13) · full TS build (18 routes) · all 3 migrations applied to the live
+project.
 
 **Built but NOT runtime-verified yet** (blocked on keys/OAuth config at the
 time of writing): end-to-end DB flows (needs `SUPABASE_SERVICE_ROLE_KEY`),
-streaming chat + wiki synthesis (needs an LLM key), Google sign-in (needs
-provider enabled), live blog/YouTube fetching (this codebase was built in a
-sandbox with blocked egress — the code is fixture-tested; test live after
-setup). Work through docs/SETUP.md §6 as the acceptance checklist.
+streaming chat + wiki/persona synthesis + gap questions (need an LLM key),
+Google sign-in (needs provider enabled), live blog/YouTube/sitemap fetching
+(fixture-tested; test live after setup), avatar upload against live
+storage. Work through docs/SETUP.md §6 as the acceptance checklist.
 
 ## Known gaps / deliberate deferrals
 
