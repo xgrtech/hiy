@@ -1,104 +1,119 @@
 "use client";
-/** Creator dashboard shell: Profile / Knowledge / Behavior / Refine / Share. */
+/** Creator app shell per "Hiy Mockups" §3: dark sidebar + warm content. */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileTab from "./dashboard/ProfileTab";
-import KnowledgeTab from "./dashboard/KnowledgeTab";
-import BehaviorTab from "./dashboard/BehaviorTab";
-import ShareTab from "./dashboard/ShareTab";
+import Link from "next/link";
+import DashboardHome from "./dashboard/DashboardHome";
+import TrainingView from "./dashboard/TrainingView";
+import AnalyticsView from "./dashboard/AnalyticsView";
+import SettingsView from "./dashboard/SettingsView";
 import InterviewFlow from "./InterviewFlow";
-import type { TwinRecord, SourceRecord } from "./dashboard/types";
+import type { TwinRecord, SourceRecord, AppStats } from "./dashboard/types";
 
-const TABS = [
-  { key: "knowledge", label: "Knowledge" },
-  { key: "refine", label: "Refine" },
-  { key: "profile", label: "Profile" },
-  { key: "behavior", label: "Behavior" },
-  { key: "share", label: "Share" },
+const NAV = [
+  { key: "home", label: "Dashboard", icon: "▦" },
+  { key: "training", label: "Training", icon: "✎" },
+  { key: "refine", label: "Refine", icon: "◈" },
+  { key: "analytics", label: "Analytics", icon: "◔" },
+  { key: "settings", label: "Settings", icon: "⚙" },
 ] as const;
 
-type TabKey = (typeof TABS)[number]["key"];
+export type ViewKey = (typeof NAV)[number]["key"];
 
 export default function Dashboard({
   twin,
   sources,
   wiki,
+  stats,
 }: {
   twin: TwinRecord;
   sources: SourceRecord[];
   wiki: string | null;
+  stats: AppStats;
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<TabKey>("knowledge");
+  const [view, setView] = useState<ViewKey>("home");
   const hasInterview = sources.some((s) => s.type === "interview");
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10">
-      <header className="mb-6 flex items-center gap-5">
-        {twin.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={twin.avatar_url}
-            alt=""
-            className="arch h-16 w-14 border border-line object-cover"
-          />
-        ) : (
-          <div className="orb h-14 w-14" />
-        )}
-        <div className="flex-1">
-          <h1 className="font-display text-2xl font-medium">{twin.name}&apos;s twin</h1>
-          <p className="text-sm text-inksoft">
-            hiy.ai/{twin.slug} ·{" "}
-            <span className={twin.status === "live" ? "text-accent" : ""}>{twin.status}</span>
-            {!hasInterview && (
-              <>
-                {" "}
-                ·{" "}
-                <button
-                  onClick={() => setTab("refine")}
-                  className="text-accent underline decoration-dotted underline-offset-2"
-                >
-                  interview your twin →
-                </button>
-              </>
-            )}
-          </p>
-        </div>
-        <a
-          href={`/${twin.slug}`}
-          target="_blank"
-          className="rounded-full border border-line px-4 py-2 text-sm hover:border-accent"
-        >
-          View public page ↗
-        </a>
-      </header>
-
-      <nav className="mb-7 inline-flex flex-wrap gap-0.5 rounded-full border border-line bg-surface2 p-1">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`rounded-full px-4 py-2 text-sm transition ${
-              tab === t.key
-                ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(28,27,24,.12)]"
-                : "text-inksoft hover:text-ink"
-            }`}
+    <main className="flex min-h-screen">
+      {/* sidebar */}
+      <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col bg-dark text-white lg:w-56">
+        <Link href="/" className="font-display px-5 pb-6 pt-6 text-xl hidden lg:block">
+          hiy<span className="text-accent">.ai</span>
+        </Link>
+        <span className="font-display px-5 pb-6 pt-6 text-xl lg:hidden">h</span>
+        <nav className="flex flex-1 flex-col gap-1 px-3">
+          {NAV.map((n) => (
+            <button
+              key={n.key}
+              onClick={() => setView(n.key)}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition ${
+                view === n.key
+                  ? "bg-white/10 font-semibold text-white"
+                  : "text-white/55 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <span aria-hidden className="w-4 text-center">{n.icon}</span>
+              <span className="hidden lg:inline">{n.label}</span>
+              {n.key === "refine" && !hasInterview && (
+                <span className="ml-auto hidden h-1.5 w-1.5 rounded-full bg-accent lg:block" />
+              )}
+              {n.key === "home" && stats.needsReview > 0 && (
+                <span className="ml-auto hidden rounded-full bg-accent px-1.5 text-[10px] font-bold lg:block">
+                  {stats.needsReview}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+        <div className="hidden px-4 pb-3 lg:block">
+          <Link
+            href="/pricing"
+            className="block rounded-xl bg-gradient-to-br from-[#3a3129] to-[#2a241e] px-4 py-3 text-xs text-white/70 transition hover:text-white"
           >
-            {t.label}
-            {t.key === "refine" && !hasInterview && (
-              <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-accent2 align-middle" />
-            )}
-          </button>
-        ))}
-      </nav>
+            <b className="block text-white">Free while we launch</b>
+            See what paid tiers will add →
+          </Link>
+        </div>
+        <div className="flex items-center gap-2.5 border-t border-white/10 px-4 py-4">
+          {twin.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={twin.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-xs">
+              {twin.name.slice(0, 1)}
+            </span>
+          )}
+          <div className="hidden min-w-0 lg:block">
+            <p className="truncate text-xs font-semibold">{twin.name}</p>
+            <p className="text-[10px] text-white/50">Starter plan</p>
+          </div>
+        </div>
+      </aside>
 
-      {tab === "knowledge" && <KnowledgeTab twin={twin} sources={sources} wiki={wiki} />}
-      {tab === "refine" && (
-        <InterviewFlow twinId={twin.id} twinName={twin.name} onDone={() => router.refresh()} />
-      )}
-      {tab === "profile" && <ProfileTab twin={twin} />}
-      {tab === "behavior" && <BehaviorTab twin={twin} />}
-      {tab === "share" && <ShareTab twin={twin} />}
+      {/* content */}
+      <section className="min-w-0 flex-1 px-5 py-8 sm:px-8">
+        <div className="mx-auto max-w-4xl">
+          {view === "home" && (
+            <DashboardHome twin={twin} stats={stats} sources={sources} go={(v) => setView(v)} />
+          )}
+          {view === "training" && (
+            <TrainingView
+              twin={twin}
+              sources={sources}
+              wiki={wiki}
+              stats={stats}
+              goRefine={() => setView("refine")}
+            />
+          )}
+          {view === "refine" && (
+            <InterviewFlow twinId={twin.id} twinName={twin.name} onDone={() => router.refresh()} />
+          )}
+          {view === "analytics" && <AnalyticsView stats={stats} />}
+          {view === "settings" && <SettingsView twin={twin} />}
+        </div>
+      </section>
     </main>
   );
 }

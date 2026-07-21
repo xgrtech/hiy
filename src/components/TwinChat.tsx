@@ -1,8 +1,8 @@
 "use client";
 /**
- * Streaming chat UI used by the public twin page and the embed frame.
- * Understands greetings, ?q= auto-ask, cited-source panels, and gives
- * honest "I don't know" replies a deliberate visual treatment.
+ * Chat per "Hiy Mockups" §4a/4c: a big ask-input with suggested chips below;
+ * the conversation grows above once it starts. Citations ride each answer;
+ * honest "I don't know" replies get the dashed treatment.
  */
 import { useEffect, useRef, useState } from "react";
 
@@ -31,7 +31,6 @@ export default function TwinChat({
   initialQuestion?: string;
   avatarUrl?: string | null;
   compact?: boolean;
-  /** Render without the outer card chrome (parent supplies the frame). */
   frameless?: boolean;
 }) {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -106,46 +105,25 @@ export default function TwinChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
 
-  const showGreeting = messages.length === 0 && Boolean(greeting);
+  const started = messages.length > 0;
+  const showGreeting = !started && Boolean(greeting);
 
   return (
-    <div>
-      {messages.length === 0 && suggested.length > 0 && (
-        <div className={`mb-4 flex flex-wrap gap-2 ${compact ? "" : "justify-center"}`}>
-          {suggested.map((s) => (
-            <button
-              key={s}
-              onClick={() => send(s)}
-              className="rounded-full border border-line bg-surface px-4 py-2 text-[13px] shadow-sm transition hover:border-accent"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-      <div
-        className={
-          frameless
-            ? ""
-            : "rounded-3xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(28,27,24,.04),0_10px_34px_rgba(28,27,24,.07)]"
-        }
-      >
+    <div className={frameless ? "" : "rounded-3xl border border-line bg-surface p-5"}>
+      {(started || showGreeting) && (
         <div
           ref={scrollRef}
-          className={`flex flex-col gap-2.5 overflow-y-auto ${compact ? "max-h-72" : "max-h-96"}`}
+          className={`mb-4 flex flex-col gap-3 overflow-y-auto rounded-2xl border border-line bg-surface p-4 text-left ${
+            compact ? "max-h-72" : "max-h-[26rem]"
+          }`}
         >
           {showGreeting && (
-            <div className="bubble-in flex items-end gap-2">
-              <Avatar avatarUrl={avatarUrl} />
-              <div className="max-w-[88%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-surface2 px-4 py-2.5 text-sm leading-relaxed">
+            <div className="flex items-end gap-2">
+              <Avatar avatarUrl={avatarUrl} name={name} />
+              <div className="max-w-[88%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-paper px-4 py-2.5 text-sm leading-relaxed">
                 {greeting}
               </div>
             </div>
-          )}
-          {messages.length === 0 && !showGreeting && (
-            <p className="py-6 text-center text-sm text-inkfaint">
-              Ask {name}&apos;s twin anything.
-            </p>
           )}
           {messages.map((m, i) => {
             const honest =
@@ -153,14 +131,14 @@ export default function TwinChat({
             return (
               <div key={i} className="bubble-in">
                 <div className={m.role === "assistant" ? "flex items-end gap-2" : ""}>
-                  {m.role === "assistant" && <Avatar avatarUrl={avatarUrl} />}
+                  {m.role === "assistant" && <Avatar avatarUrl={avatarUrl} name={name} />}
                   <div
                     className={`max-w-[88%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                       m.role === "user"
-                        ? "ml-auto rounded-br-md bg-accent text-white"
+                        ? "ml-auto rounded-br-md bg-dark text-white"
                         : honest
                           ? "rounded-bl-md border border-dashed border-line bg-paper"
-                          : "rounded-bl-md bg-surface2"
+                          : "rounded-bl-md bg-paper"
                     }`}
                   >
                     {m.content ||
@@ -175,57 +153,71 @@ export default function TwinChat({
                       ))}
                   </div>
                 </div>
-                {honest && (
+                {honest ? (
                   <p className="ml-9 mt-1 text-[11px] text-inkfaint">
-                    Honest answer — {name} hasn&apos;t taught their twin this yet.
+                    Honest answer — {name} hasn&apos;t taught their hiy this yet.
                   </p>
-                )}
-                {m.role === "assistant" &&
+                ) : (
+                  m.role === "assistant" &&
                   m.sources &&
                   m.sources.length > 0 &&
-                  m.content &&
-                  !honest && (
-                    <details className="ml-9 mt-1">
-                      <summary className="cursor-pointer list-none text-[11px] text-inkfaint hover:text-inksoft">
-                        Sources ({m.sources.length}) ▸
-                      </summary>
-                      <ol className="mt-1 space-y-0.5">
-                        {m.sources.map((s, j) => (
-                          <li key={s} className="text-[11px] text-inksoft">
-                            <span className="font-medium text-accent">[{j + 1}]</span> {s}
-                          </li>
-                        ))}
-                      </ol>
-                    </details>
-                  )}
+                  m.content && (
+                    <p className="ml-9 mt-1.5 flex flex-wrap gap-1.5">
+                      {m.sources.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-paper px-2.5 py-1 text-[10px] font-medium text-inksoft"
+                        >
+                          ⌘ From: {s}
+                        </span>
+                      ))}
+                    </p>
+                  )
+                )}
               </div>
             );
           })}
         </div>
-        {error && <p className="mt-2 text-xs text-accent2">{error}</p>}
-        <div className="mt-3 flex items-center gap-2 rounded-full border border-line py-1.5 pl-4 pr-1.5">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send(input)}
-            placeholder={`Ask ${name}'s twin anything…`}
-            className="flex-1 bg-transparent text-sm outline-none"
-          />
-          <button
-            onClick={() => send(input)}
-            disabled={busy}
-            className="h-9 w-9 rounded-full bg-ink text-paper transition hover:scale-110 hover:bg-accent disabled:opacity-40"
-            aria-label="Send"
-          >
-            →
-          </button>
-        </div>
+      )}
+
+      {error && <p className="mb-2 text-xs text-accent">{error}</p>}
+
+      <div className="flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-5 pr-1.5 shadow-[0_2px_10px_rgba(33,29,24,.06)]">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && send(input)}
+          placeholder={started ? `Message ${name}'s hiy…` : `Ask ${name.split(" ")[0]} anything…`}
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-inkfaint"
+        />
+        <button
+          onClick={() => send(input)}
+          disabled={busy}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white transition hover:bg-accentdeep disabled:opacity-40"
+          aria-label="Send"
+        >
+          ↑
+        </button>
       </div>
+
+      {!started && suggested.length > 0 && (
+        <div className={`mt-3 flex flex-wrap gap-2 ${compact ? "" : "justify-center"}`}>
+          {suggested.map((s) => (
+            <button
+              key={s}
+              onClick={() => send(s)}
+              className="rounded-full border border-line bg-surface px-4 py-2 text-[12.5px] text-inksoft transition hover:border-accent hover:text-accent"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function Avatar({ avatarUrl }: { avatarUrl?: string | null }) {
+function Avatar({ avatarUrl, name }: { avatarUrl?: string | null; name: string }) {
   return avatarUrl ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -234,6 +226,8 @@ function Avatar({ avatarUrl }: { avatarUrl?: string | null }) {
       className="h-7 w-7 shrink-0 rounded-full border border-line object-cover"
     />
   ) : (
-    <div className="orb h-7 w-7 shrink-0" />
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+      {name.slice(0, 1)}
+    </span>
   );
 }

@@ -1,16 +1,22 @@
 @import "tailwindcss";
 
+/* Mockup-sourced tokens ("Hiy Mockups.dc.html"): warm paper neutrals, one
+   terracotta accent; Instrument Serif display + Instrument Sans UI. */
 :root {
-  --paper: #f4f1ea;
+  --paper: #f0ede8;
   --surface: #ffffff;
-  --surface-2: #efeae0;
-  --ink: #1c1b18;
-  --ink-soft: #6d6a62;
-  --ink-faint: #9a978e;
-  --line: #e5e0d5;
-  --accent: #1f5648;
-  --accent-2: #c8613a;
-  --accent-soft: #e4ede9;
+  --surface-2: #e9e4dc;
+  --ink: #211d18;
+  --ink-soft: #6b645b;
+  --ink-faint: #9a938a;
+  --line: #e2ddd4;
+  --dark: #211d18;
+  --accent: #c2542f; /* terracotta — THE accent */
+  --accent-2: #c2542f; /* legacy alias */
+  --accent-deep: #a8461f;
+  --accent-soft: #f6e4dc;
+  --green: #2f7a4f; /* live-status + citation trust marks only */
+  --green-soft: #e3efe7;
 }
 
 @theme inline {
@@ -21,17 +27,21 @@
   --color-inksoft: var(--ink-soft);
   --color-inkfaint: var(--ink-faint);
   --color-line: var(--line);
+  --color-dark: var(--dark);
   --color-accent: var(--accent);
   --color-accent2: var(--accent-2);
+  --color-accentdeep: var(--accent-deep);
   --color-accentsoft: var(--accent-soft);
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --color-green: var(--green);
+  --color-greensoft: var(--green-soft);
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
 }
 
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Instrument Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -95,7 +105,8 @@ body:has(.wash-none)::before {
 }
 
 .font-display {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
 }
 
 /* ---------- brand objects: arch card · artifacts · canvas · CTAs ---------- */
@@ -142,10 +153,17 @@ body:has(.wash-none)::before {
    gradient field so the arch never reads as empty marble. */
 .dome {
   background:
-    radial-gradient(90% 90% at 50% 0%, #cfe6da 0%, transparent 62%),
-    radial-gradient(70% 60% at 18% 30%, color-mix(in oklab, #f3d9c8 75%, transparent) 0%, transparent 60%),
-    radial-gradient(80% 70% at 85% 22%, color-mix(in oklab, #d3dce4 70%, transparent) 0%, transparent 58%),
-    linear-gradient(180deg, #e9f0ea 0%, var(--surface) 92%);
+    radial-gradient(90% 90% at 50% 0%, #f6ddcb 0%, transparent 62%),
+    radial-gradient(70% 60% at 18% 30%, color-mix(in oklab, #efd3c6 75%, transparent) 0%, transparent 60%),
+    radial-gradient(80% 70% at 85% 22%, color-mix(in oklab, #e3dcd2 75%, transparent) 0%, transparent 58%),
+    linear-gradient(180deg, #f4e8dd 0%, var(--surface) 92%);
+}
+/* Mockup avatar ring: white inner ring + soft terracotta halo. */
+.ring-ava {
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 2.5px color-mix(in oklab, var(--accent) 60%, #b06bc4),
+    0 14px 40px rgba(194, 84, 47, 0.25);
 }
 /* Marketing CTA: terracotta carries the energy; green stays trust/product. */
 .btn-warm {
@@ -154,12 +172,12 @@ body:has(.wash-none)::before {
   border-radius: 999px;
   font-weight: 600;
   transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, filter 0.18s ease;
-  box-shadow: 0 10px 30px rgba(200, 97, 58, 0.35);
+  box-shadow: 0 10px 30px rgba(194, 84, 47, 0.32);
 }
 .btn-warm:hover {
   transform: translateY(-2px);
   filter: brightness(1.06);
-  box-shadow: 0 16px 40px rgba(200, 97, 58, 0.42);
+  box-shadow: 0 16px 40px rgba(194, 84, 47, 0.4);
 }
 /* Honesty chips — the imagery competitors can't show. */
 .chip-cite {
@@ -189,9 +207,9 @@ body:has(.wash-none)::before {
 .orb {
   position: relative;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #bff0dd 0%, #4fb597 38%, #1f5648 78%);
+  background: radial-gradient(circle at 34% 28%, #f2bb97 0%, #d97748 40%, #a8461f 80%);
   box-shadow:
-    0 22px 60px rgba(31, 86, 72, 0.3),
+    0 22px 60px rgba(194, 84, 47, 0.3),
     inset 0 -12px 34px rgba(0, 0, 0, 0.22),
     inset 0 12px 26px rgba(255, 255, 255, 0.45);
   animation: orb-breathe 5.5s ease-in-out infinite;
@@ -201,7 +219,7 @@ body:has(.wash-none)::before {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 68% 72%, rgba(180, 240, 215, 0.95), transparent 52%);
+  background: radial-gradient(circle at 68% 72%, rgba(248, 214, 188, 0.95), transparent 52%);
   mix-blend-mode: screen;
   animation: orb-drift 9s ease-in-out infinite alternate;
 }

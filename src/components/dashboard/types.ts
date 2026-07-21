@@ -27,6 +27,36 @@ export interface SourceRecord {
   word_count: number;
 }
 
+export interface DayCount {
+  day: string;
+  label: string;
+  count: number;
+}
+
+export interface RecentConversation {
+  id: string;
+  question: string;
+  messages: number;
+  at: string;
+}
+
+export interface TopQuestion {
+  question: string;
+  count: number;
+}
+
+export interface AppStats {
+  conversations: number;
+  conversationsWeek: number;
+  messages: number;
+  needsReview: number;
+  days: DayCount[];
+  recent: RecentConversation[];
+  topQuestions: TopQuestion[];
+  needsReviewList: TopQuestion[];
+  trainingWords: number;
+}
+
 export async function patchProfile(
   twinId: string,
   fields: Record<string, unknown>

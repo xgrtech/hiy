@@ -1,206 +1,247 @@
 import Link from "next/link";
 import InstantTwin from "@/components/InstantTwin";
 
-/* Floating evidence around the hero: content stats, visitor questions,
-   and the honesty moments (citations, "I don't know") — hiy's imagery. */
-const ARTIFACTS = [
-  { text: "Blog · 74 posts", cls: "left-[4%] top-[16%] hidden lg:block", tilt: "-7deg", delay: "0s" },
-  { text: "YouTube · 28 videos", cls: "left-[10%] top-[46%] hidden lg:block", tilt: "5deg", delay: "1.2s" },
-  { text: "Interview · 18 answers", cls: "left-[5%] top-[74%] hidden xl:block", tilt: "-4deg", delay: "2.1s" },
-  { text: "London, UK — “What's your take on pricing?”", cls: "right-[3%] top-[14%] hidden lg:block max-w-52", tilt: "6deg", delay: "0.6s" },
-  { text: "cited · 2 sources ✓", cls: "right-[12%] top-[44%] hidden lg:block", tilt: "-5deg", delay: "1.7s", accent: true },
-  { text: "“Not in my sources yet — honestly, I don't know.”", cls: "right-[4%] top-[70%] hidden xl:block max-w-56", tilt: "4deg", delay: "2.6s", dashed: true },
+/* Landing per "Hiy Mockups.dc.html" §1a — warm & human, one terracotta
+   accent, Instrument Serif display. Copy adapted to shipped features only
+   (no voice/email claims yet). */
+
+const FEATURES = [
+  {
+    t: "Cites its sources",
+    d: "Every grounded answer links back to the talk, post, or chapter it came from — by default, never a paid add-on.",
+  },
+  {
+    t: "Says “I don't know”",
+    d: "When a question falls outside your content, your hiy admits it in your tone instead of improvising in your name.",
+  },
+  {
+    t: "Sounds like you",
+    d: "A short interview distills your tone, takes, and boundaries into a persona — answers phrased the way you'd phrase them.",
+  },
+  {
+    t: "Feeds on whole libraries",
+    d: "Import an entire blog from its sitemap or a full YouTube channel in one go. It becomes one clean knowledge base.",
+  },
+  {
+    t: "Lives on your site",
+    d: "An embeddable widget plus deep links that auto-ask your best question. hiy.ai/you goes wherever your bio goes.",
+  },
+  {
+    t: "You stay in control",
+    d: "Read everything it knows, correct anything it says, set off-limits topics. Corrections override everything else.",
+  },
 ];
 
-const DEMO_CHAT = {
-  q1: "What do you actually recommend for pricing a first product?",
-  a1: "Start embarrassingly simple: one price, monthly, no tiers. I wrote about this after my first launch flopped — charge from day one, raise it every ten customers until people hesitate.",
-  q2: "What's your favourite restaurant in Lisbon?",
-  a2: "That's not in my knowledge yet — I honestly don't know. Ask me about launching products or pricing, that's where I can actually help.",
-};
+const STEPS = [
+  {
+    n: "1 — Feed",
+    d: "Paste links, sync your blog or YouTube, drop in PDFs. It builds from what you've already made.",
+    art: (
+      <div className="flex flex-wrap gap-1.5">
+        {["Blog · 46 posts", "YouTube · 84", "PDF", "Interview"].map((c) => (
+          <span key={c} className="rounded-full border border-white/15 px-2.5 py-1 text-[10px] text-white/60">
+            {c}
+          </span>
+        ))}
+      </div>
+    ),
+  },
+  {
+    n: "2 — Learn",
+    d: "Not just what you know — how you say it. Answers sound like you, not a generic assistant.",
+    art: (
+      <div className="flex h-8 items-end gap-1">
+        {[3, 6, 4, 8, 5, 7, 3, 6, 4, 5, 7, 4].map((h, i) => (
+          <span key={i} className="w-1.5 rounded-full bg-accent/70" style={{ height: `${h * 4}px` }} />
+        ))}
+      </div>
+    ),
+  },
+  {
+    n: "3 — Share",
+    d: "Get hiy.ai/you — a link anyone can visit. Or drop the widget straight onto your site.",
+    art: (
+      <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[11px] text-white/80">
+        hiy.ai/<b className="text-white">you</b> <span className="text-accent">↗</span>
+      </span>
+    ),
+  },
+];
 
 export default function Landing() {
   return (
     <main className="relative overflow-hidden">
-      {/* ===== hero canvas ===== */}
-      <section className="canvas relative mx-3 mt-3 overflow-hidden sm:mx-4 sm:mt-4">
-        <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-6 sm:px-10">
-          <div className="text-xl font-bold tracking-tight">
-            hiy<span className="text-accent2">.ai</span>
-          </div>
-          <div className="hidden gap-8 text-sm text-inksoft sm:flex">
-            <a href="#honest" className="transition hover:text-ink">Why honest</a>
-            <a href="#how" className="transition hover:text-ink">How it works</a>
-          </div>
+      {/* nav — centered pill group per mockup */}
+      <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
+        <div className="font-display text-2xl">
+          hiy<span className="text-accent">.ai</span>
+        </div>
+        <div className="hidden items-center gap-1 rounded-full border border-line bg-surface p-1 text-[13px] text-inksoft md:flex">
+          <a href="#how" className="rounded-full px-4 py-1.5 transition hover:text-ink">How it works</a>
+          <a href="#try" className="rounded-full px-4 py-1.5 transition hover:text-ink">Try it</a>
+          <Link href="/pricing" className="rounded-full px-4 py-1.5 transition hover:text-ink">Pricing</Link>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Link href="/app" className="px-2 text-[13px] font-medium text-inksoft transition hover:text-ink">
+            Log in
+          </Link>
           <Link
             href="/app"
-            className="rounded-full border border-line bg-surface px-5 py-2 text-sm font-medium transition hover:border-ink"
+            className="rounded-full bg-dark px-4.5 py-2 text-[13px] font-semibold text-white transition hover:bg-accent"
           >
-            Sign in
+            Create your hiy
           </Link>
-        </nav>
-
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pb-16 pt-6 sm:px-10">
-          {/* arch card + floating artifacts */}
-          <div className="relative">
-            {ARTIFACTS.map((a) => (
-              <div
-                key={a.text}
-                className={`artifact ${a.cls} ${a.accent ? "!border-accent !text-accent" : ""} ${a.dashed ? "!border-dashed" : ""}`}
-                style={{ "--tilt": a.tilt, "--float-delay": a.delay } as React.CSSProperties}
-              >
-                {a.text}
-              </div>
-            ))}
-            <InstantTwin />
-          </div>
-
-          <h1 className="font-display mx-auto mt-12 max-w-3xl text-center text-[clamp(2.1rem,4vw,3.3rem)] font-medium leading-[1.08] tracking-[-0.02em] [text-wrap:balance]">
-            <span className="text-inksoft">A twin that talks like you —</span>{" "}
-            <span className="block">and knows when it doesn&apos;t know.</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-center text-lg leading-relaxed text-inksoft">
-            Point hiy at your writing, talks, and videos. Get a twin that answers
-            in your voice, cites its sources, and never improvises in your name.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/app" className="btn-warm px-7 py-3.5 text-sm">
-              Create your twin — free
-            </Link>
-            <a
-              href="#honest"
-              className="rounded-full border border-line bg-surface px-7 py-3.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
-            >
-              Why honest matters
-            </a>
-          </div>
-          <p className="mt-5 text-center text-xs text-inkfaint">
-            hiy.ai/your-name · visitors always chat free · clearly labeled AI
-          </p>
         </div>
-      </section>
+      </nav>
 
-      {/* ===== the honesty demo ===== */}
-      <section id="honest" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
-          <div>
-            <h2 className="font-display text-[clamp(1.9rem,3.4vw,2.8rem)] font-medium leading-tight [text-wrap:balance]">
-              Most AI clones improvise.
-              <br />
-              <span className="text-accent">Yours will cite — or admit it.</span>
-            </h2>
-            <p className="mt-5 max-w-md leading-relaxed text-inksoft">
-              Every grounded answer shows which of your sources it drew from.
-              And when a question falls outside your content, your twin says so —
-              in your tone, without inventing a word. That&apos;s the default,
-              never a paid add-on.
-            </p>
-            <ul className="mt-6 space-y-2.5 text-sm text-inksoft">
-              <li className="flex items-center gap-2.5">
-                <span className="chip-cite">cited ✓</span> sources named on every grounded reply
-              </li>
-              <li className="flex items-center gap-2.5">
-                <span className="chip-idk">honest</span> &ldquo;I don&apos;t know&rdquo; is designed in, not patched on
-              </li>
-              <li className="flex items-center gap-2.5">
-                <span className="chip-cite">labeled</span> every page discloses it&apos;s an AI twin
-              </li>
-            </ul>
-          </div>
-
-          {/* composed product demo — the real chat components' visual language */}
-          <div className="rounded-[28px] border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(28,27,24,.04),0_24px_70px_rgba(28,27,24,.1)]">
-            <div className="mb-4 flex items-center gap-2.5 border-b border-line pb-4">
-              <div className="orb h-8 w-8" />
-              <div>
-                <p className="text-sm font-semibold leading-tight">Maya&apos;s twin</p>
-                <p className="text-[10px] text-inkfaint">AI twin — not the real person</p>
-              </div>
-            </div>
-            <div className="space-y-3 text-sm leading-relaxed">
-              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-white">
-                {DEMO_CHAT.q1}
-              </p>
-              <div>
-                <p className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-surface2 px-4 py-2.5">
-                  {DEMO_CHAT.a1}
-                </p>
-                <p className="ml-1 mt-1.5 flex gap-1.5">
-                  <span className="chip-cite">[1] Pricing my first product</span>
-                  <span className="chip-cite">[2] Launch post-mortem</span>
-                </p>
-              </div>
-              <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-white">
-                {DEMO_CHAT.q2}
-              </p>
-              <div>
-                <p className="w-fit max-w-[88%] rounded-2xl rounded-bl-md border border-dashed border-line bg-paper px-4 py-2.5">
-                  {DEMO_CHAT.a2}
-                </p>
-                <p className="ml-1 mt-1.5">
-                  <span className="chip-idk">honest answer — nothing invented</span>
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* hero */}
+      <header className="relative mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-20">
+        <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-accentsoft blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-[#e7e0f0] blur-3xl" aria-hidden />
+        <p className="relative text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
+          Your AI self
+        </p>
+        <h1 className="font-display relative mt-5 text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
+          Be there for everyone,
+          <br />
+          <em className="text-accent">even when you can&apos;t be.</em>
+        </h1>
+        <p className="relative mx-auto mt-6 max-w-xl text-lg leading-relaxed text-inksoft">
+          hiy learns from everything you&apos;ve written, recorded, and said —
+          then answers your people in your words, any hour, anywhere. Honestly.
+        </p>
+        <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/app" className="btn-warm px-7 py-3.5 text-sm">
+            Create your hiy — free
+          </Link>
+          <a
+            href="#try"
+            className="rounded-full border border-line bg-surface px-7 py-3.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
+          >
+            Try a 30-second preview
+          </a>
         </div>
-      </section>
+        <p className="relative mt-4 text-xs text-inkfaint">
+          Live in under 5 minutes · No credit card
+        </p>
+      </header>
 
-      {/* ===== how it works: a real sequence ===== */}
-      <section id="how" className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
-        <h2 className="font-display text-center text-[clamp(1.9rem,3.4vw,2.8rem)] font-medium [text-wrap:balance]">
-          From your content to your twin in minutes.
-        </h2>
-        <div className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-          <div aria-hidden className="absolute left-[16%] right-[16%] top-5 hidden border-t-2 border-dashed border-line md:block" />
+      {/* try strip — the real conversion object, flanked by honest examples */}
+      <section id="try" className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
+        <p className="mb-6 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-inkfaint">
+          Make one right now — no account
+        </p>
+        <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-[1fr_1.2fr_1fr]">
           {[
             {
-              n: "1",
-              t: "Feed it your world",
-              d: "Import a whole blog or YouTube channel at once, upload files, paste anything. It becomes one clean knowledge base you can read and correct.",
+              init: "MC",
+              name: "Maya Chen",
+              role: "Startup coach — example hiy",
+              qs: ["How do I price my first product?", "When should I raise vs. bootstrap?"],
             },
-            {
-              n: "2",
-              t: "It learns your voice",
-              d: "A short interview — your twin asks about your tone, takes, and boundaries — then a persona is distilled so it phrases things the way you would.",
-            },
-            {
-              n: "3",
-              t: "Share one link",
-              d: "hiy.ai/your-name, ready for a bio line or your own site via the embed. Deep links can even auto-ask your best question.",
-            },
-          ].map((s) => (
-            <div key={s.n} className="relative text-center md:px-2">
-              <div className="relative z-10 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-ink font-display text-lg text-paper">
-                {s.n}
+          ].map((p) => (
+            <div key={p.name} className="hidden rounded-2xl border border-line bg-surface p-5 lg:block">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent font-display text-sm text-white">
+                  {p.init}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold">{p.name}</p>
+                  <p className="text-xs text-inkfaint">{p.role}</p>
+                </div>
               </div>
-              <h3 className="mt-4 font-semibold">{s.t}</h3>
-              <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-inksoft">{s.d}</p>
+              <div className="mt-3.5 space-y-2">
+                {p.qs.map((q) => (
+                  <p key={q} className="rounded-full border border-line px-3.5 py-2 text-xs text-inksoft">
+                    {q}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ))}
+          <InstantTwin />
+          <div className="hidden rounded-2xl border border-line bg-surface p-5 lg:block">
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-green font-display text-sm text-white">
+                AO
+              </span>
+              <div>
+                <p className="text-sm font-semibold">Dr. Ade Okafor</p>
+                <p className="text-xs text-inkfaint">Nutrition educator — example hiy</p>
+              </div>
+            </div>
+            <div className="mt-3.5 space-y-2">
+              {["Is intermittent fasting right for me?", "What does your book say about sugar?"].map((q) => (
+                <p key={q} className="rounded-full border border-line px-3.5 py-2 text-xs text-inksoft">
+                  {q}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* dark: three steps */}
+      <section id="how" className="bg-dark px-6 py-20 text-white sm:px-10">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)] [text-wrap:balance]">
+            Three steps to your hiy
+          </h2>
+          <p className="mt-2 text-center text-sm text-white/60">
+            Feed it your content. It learns your voice. Share it with the world.
+          </p>
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {STEPS.map((s) => (
+              <div key={s.n} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <p className="font-display text-lg text-accent">{s.n}</p>
+                <div className="mt-4 flex min-h-14 items-center rounded-xl border border-white/8 bg-white/[0.03] p-3.5">
+                  {s.art}
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-white/70">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* more than a chatbot */}
+      <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+        <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)]">
+          More than a chatbot
+        </h2>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f) => (
+            <div key={f.t} className="rounded-2xl border border-line bg-surface p-5">
+              <h3 className="text-[15px] font-semibold">{f.t}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-inksoft">{f.d}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ===== closing band: terracotta drench ===== */}
-      <section className="mx-3 mb-3 overflow-hidden rounded-[clamp(20px,4vw,44px)] bg-accent2 px-6 py-20 text-center sm:mx-4 sm:mb-4">
-        <h2 className="font-display mx-auto max-w-2xl text-[clamp(2rem,4.5vw,3.4rem)] font-medium leading-tight text-white [text-wrap:balance]">
-          Your twin is 60 seconds away.
+      {/* closing */}
+      <section className="px-6 pb-20 pt-6 text-center">
+        <h2 className="font-display text-[clamp(2.2rem,5vw,3.6rem)] leading-tight [text-wrap:balance]">
+          Your people are asking.
+          <br />
+          <em className="text-accent">Say hiy.</em>
         </h2>
-        <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-white/85">
-          Make a free preview from one blog post — no account. Keep it forever by
-          claiming hiy.ai/your-name.
-        </p>
-        <Link
-          href="/app"
-          className="mt-8 inline-block rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-accent2 transition hover:scale-[1.03]"
-        >
-          Create your twin
+        <Link href="/app" className="btn-warm mt-8 inline-block px-8 py-3.5 text-sm">
+          Create your free hiy
         </Link>
       </section>
 
-      <footer className="py-10 text-center text-xs text-inkfaint">
-        hiy.ai — your twin, honestly ·{" "}
-        <a href="mailto:hello@hiy.ai" className="underline">Contact</a>
+      <footer className="border-t border-line px-6 py-8 sm:px-10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-xs text-inkfaint">
+          <span className="font-display text-base text-ink">
+            hiy<span className="text-accent">.ai</span>
+          </span>
+          <span className="flex gap-5">
+            <Link href="/pricing" className="hover:text-ink">Pricing</Link>
+            <a href="mailto:hello@hiy.ai" className="hover:text-ink">Contact</a>
+          </span>
+          <span>© 2026 hiy.ai — clearly labeled AI, always</span>
+        </div>
       </footer>
     </main>
   );

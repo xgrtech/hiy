@@ -37,14 +37,13 @@ export default function InstantTwin() {
   }
 
   return (
-    <div className="arch arch-shadow relative mx-auto w-full max-w-[380px] overflow-hidden border border-line bg-surface">
-      {/* dome: the twin taking shape */}
-      <div className="dome flex flex-col items-center px-8 pb-4 pt-12">
-        <div className={`orb h-28 w-28 ${busy ? "orb--thinking" : ""}`} />
-        <p className="font-display mt-4 text-xl font-medium">
-          {name.trim() ? `${name.trim()}'s twin` : "Your twin"}
+    <div className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.1)]">
+      <div className="dome flex flex-col items-center px-8 pb-4 pt-8">
+        <div className={`orb h-16 w-16 ${busy ? "orb--thinking" : ""}`} />
+        <p className="font-display mt-3 text-2xl">
+          {name.trim() ? `${name.trim()}'s hiy` : "Your hiy"}
         </p>
-        <p className="mt-0.5 text-xs text-inkfaint">≈30 seconds · no account</p>
+        <p className="mt-0.5 text-xs text-inkfaint">≈30 seconds · no account · lasts 24h</p>
       </div>
 
       <div className="px-6 pb-6">
@@ -91,7 +90,7 @@ export default function InstantTwin() {
           disabled={busy}
           className="btn-warm mt-3.5 w-full px-6 py-3 text-sm disabled:opacity-50"
         >
-          {busy ? "Building your preview twin…" : "Meet your twin →"}
+          {busy ? "Building your preview hiy…" : "Meet your hiy →"}
         </button>
       </div>
     </div>

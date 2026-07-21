@@ -25,10 +25,13 @@ export default function KnowledgeTab({
   twin,
   sources,
   wiki,
+  hideList = false,
 }: {
   twin: TwinRecord;
   sources: SourceRecord[];
   wiki: string | null;
+  /** TrainingView renders its own sources table; hide the built-in list. */
+  hideList?: boolean;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("manual");
@@ -233,32 +236,34 @@ export default function KnowledgeTab({
         <BulkImport twinId={twin.id} />
       </section>
 
-      <section className="mt-6 rounded-3xl border border-line bg-surface p-6">
-        <h2 className="font-display text-lg font-medium">
-          Sources <span className="text-sm font-normal text-inkfaint">({sources.length})</span>
-        </h2>
-        {sources.length === 0 ? (
-          <p className="mt-3 text-sm text-inkfaint">Nothing yet — your twin is waiting to learn.</p>
-        ) : (
-          <ul className="mt-2 divide-y divide-line">
-            {sources.map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 py-3 text-sm">
-                <span className="min-w-0 flex-1 truncate font-medium">{s.title}</span>
-                <span className="shrink-0 text-xs text-inkfaint">
-                  {TYPE_LABELS[s.type] ?? s.type} · {s.word_count.toLocaleString()} words
-                </span>
-                <button
-                  onClick={() => deleteSource(s.id)}
-                  disabled={deleting === s.id}
-                  className="shrink-0 text-xs text-inkfaint hover:text-accent2 disabled:opacity-40"
-                >
-                  {deleting === s.id ? "removing…" : "remove"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {!hideList && (
+        <section className="mt-6 rounded-3xl border border-line bg-surface p-6">
+          <h2 className="font-display text-lg font-medium">
+            Sources <span className="text-sm font-normal text-inkfaint">({sources.length})</span>
+          </h2>
+          {sources.length === 0 ? (
+            <p className="mt-3 text-sm text-inkfaint">Nothing yet — your twin is waiting to learn.</p>
+          ) : (
+            <ul className="mt-2 divide-y divide-line">
+              {sources.map((s) => (
+                <li key={s.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                  <span className="min-w-0 flex-1 truncate font-medium">{s.title}</span>
+                  <span className="shrink-0 text-xs text-inkfaint">
+                    {TYPE_LABELS[s.type] ?? s.type} · {s.word_count.toLocaleString()} words
+                  </span>
+                  <button
+                    onClick={() => deleteSource(s.id)}
+                    disabled={deleting === s.id}
+                    className="shrink-0 text-xs text-inkfaint hover:text-accent2 disabled:opacity-40"
+                  >
+                    {deleting === s.id ? "removing…" : "remove"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       <section className="mt-6 rounded-3xl border border-line bg-surface p-6">
         <h2 className="font-display text-lg font-medium">What your twin knows</h2>
