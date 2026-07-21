@@ -35,6 +35,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ---------- ambient gradient wash (all pages) ---------- */
+/* Fixed pseudo-element instead of background-attachment:fixed (janky on
+   iOS). Built from the accent TOKENS via color-mix, so a page that
+   overrides --accent (creator-branded twins via .wash) recolors its own
+   atmosphere. Intensities stay ≤11% — warmth, never contrast loss. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(110% 85% at 88% -18%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 58%),
+    radial-gradient(95% 75% at -12% 22%, color-mix(in oklab, var(--accent-2) 7%, transparent), transparent 52%),
+    radial-gradient(130% 95% at 55% 118%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 58%);
+}
+/* Opaque variant for containers that override --accent: covers the body
+   wash and repaints it in the local accent. */
+.wash {
+  background:
+    radial-gradient(110% 85% at 88% -18%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 58%),
+    radial-gradient(95% 75% at -12% 22%, color-mix(in oklab, var(--accent-2) 7%, transparent), transparent 52%),
+    radial-gradient(130% 95% at 55% 118%, color-mix(in oklab, var(--accent) 7%, transparent), transparent 58%),
+    var(--paper);
+}
+
 .font-display {
   font-family: "Fraunces", Georgia, serif;
 }

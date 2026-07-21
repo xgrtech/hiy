@@ -40,7 +40,7 @@ export default async function TwinPage({
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden px-5 py-10"
+      className={`relative min-h-screen overflow-hidden px-5 py-10 ${accent ? "wash" : ""}`}
       style={accent ? ({ "--accent": accent } as React.CSSProperties) : undefined}
     >
       <div className="blob blob--1 -right-16 -top-32 h-[400px] w-[400px] bg-[#cfe9dd]" />
