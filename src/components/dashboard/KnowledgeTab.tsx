@@ -133,7 +133,7 @@ export default function KnowledgeTab({
   return (
     <>
       <section className="rounded-3xl border border-line bg-surface p-6 shadow-[0_10px_34px_rgba(28,27,24,.07)]">
-        <h2 className="font-semibold">Teach your twin</h2>
+        <h2 className="font-display text-lg font-medium">Teach your twin</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button
@@ -234,7 +234,7 @@ export default function KnowledgeTab({
       </section>
 
       <section className="mt-6 rounded-3xl border border-line bg-surface p-6">
-        <h2 className="font-semibold">
+        <h2 className="font-display text-lg font-medium">
           Sources <span className="text-sm font-normal text-inkfaint">({sources.length})</span>
         </h2>
         {sources.length === 0 ? (
@@ -261,7 +261,7 @@ export default function KnowledgeTab({
       </section>
 
       <section className="mt-6 rounded-3xl border border-line bg-surface p-6">
-        <h2 className="font-semibold">What your twin knows</h2>
+        <h2 className="font-display text-lg font-medium">What your twin knows</h2>
         <p className="mt-1 text-sm text-inksoft">
           The synthesized knowledge base built from your sources. Spot something
           wrong or outdated? Add a correction — it overrides everything else.

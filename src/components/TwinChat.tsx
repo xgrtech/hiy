@@ -22,6 +22,7 @@ export default function TwinChat({
   initialQuestion,
   avatarUrl,
   compact = false,
+  frameless = false,
 }: {
   slug: string;
   name: string;
@@ -30,6 +31,8 @@ export default function TwinChat({
   initialQuestion?: string;
   avatarUrl?: string | null;
   compact?: boolean;
+  /** Render without the outer card chrome (parent supplies the frame). */
+  frameless?: boolean;
 }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -121,7 +124,11 @@ export default function TwinChat({
         </div>
       )}
       <div
-        className={`rounded-3xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(28,27,24,.04),0_10px_34px_rgba(28,27,24,.07)]`}
+        className={
+          frameless
+            ? ""
+            : "rounded-3xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgba(28,27,24,.04),0_10px_34px_rgba(28,27,24,.07)]"
+        }
       >
         <div
           ref={scrollRef}

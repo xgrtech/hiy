@@ -40,7 +40,7 @@ export default function Dashboard({
           <img
             src={twin.avatar_url}
             alt=""
-            className="h-14 w-14 rounded-full border border-line object-cover"
+            className="arch h-16 w-14 border border-line object-cover"
           />
         ) : (
           <div className="orb h-14 w-14" />
@@ -73,15 +73,15 @@ export default function Dashboard({
         </a>
       </header>
 
-      <nav className="mb-6 flex flex-wrap gap-2">
+      <nav className="mb-7 inline-flex flex-wrap gap-0.5 rounded-full border border-line bg-surface2 p-1">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
+            className={`rounded-full px-4 py-2 text-sm transition ${
               tab === t.key
-                ? "border-ink bg-ink text-paper"
-                : "border-line text-inksoft hover:border-accent"
+                ? "bg-surface font-medium text-ink shadow-[0_1px_3px_rgba(28,27,24,.12)]"
+                : "text-inksoft hover:text-ink"
             }`}
           >
             {t.label}

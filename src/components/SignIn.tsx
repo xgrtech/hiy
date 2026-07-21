@@ -11,8 +11,11 @@ export default function SignIn() {
   }
   return (
     <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_10px_34px_rgba(28,27,24,.07)]">
-        <div className="orb mx-auto mb-5 h-16 w-16" />
+      <div className="arch arch-shadow w-full max-w-sm overflow-hidden border border-line bg-surface text-center">
+        <div className="bg-[radial-gradient(120%_100%_at_50%_0%,#e4ede9_0%,transparent_70%)] px-8 pb-2 pt-14">
+          <div className="orb mx-auto mb-5 h-20 w-20" />
+        </div>
+        <div className="px-8 pb-9">
         <h1 className="font-display text-2xl font-medium">Welcome to hiy.ai</h1>
         <p className="mt-2 text-sm text-inksoft">
           Sign in to build your twin. Free at hiy.ai/your-name.
@@ -26,6 +29,7 @@ export default function SignIn() {
         <p className="mt-4 text-[11px] text-inkfaint">
           By continuing you agree that your twin represents you, and only you.
         </p>
+        </div>
       </div>
     </main>
   );

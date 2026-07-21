@@ -80,7 +80,7 @@ export default function BehaviorTab({ twin }: { twin: TwinRecord }) {
 
   return (
     <section className="rounded-3xl border border-line bg-surface p-6">
-      <h2 className="font-semibold">Behavior</h2>
+      <h2 className="font-display text-lg font-medium">Behavior</h2>
 
       <h3 className="mt-5 text-sm font-semibold">Greeting</h3>
       <p className="mt-0.5 text-xs text-inkfaint">

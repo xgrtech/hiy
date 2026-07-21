@@ -1,5 +1,8 @@
 "use client";
-/** The try-before-signup wow: paste content → chat with a preview twin. */
+/**
+ * The landing hero object: an arch card where your twin is born.
+ * Paste content → meet a preview twin in ~30s. No account.
+ */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,59 +37,65 @@ export default function InstantTwin() {
   }
 
   return (
-    <div className="rounded-3xl border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(28,27,24,.04),0_10px_34px_rgba(28,27,24,.07)]">
-      <div className="mb-4 flex items-center gap-3">
-        <div className={`orb h-10 w-10 ${busy ? "orb--thinking" : ""}`} />
-        <div>
-          <div className="text-[15px] font-semibold">Try it in 30 seconds</div>
-          <div className="text-xs text-inkfaint">No account. Preview twin lasts 24 hours.</div>
-        </div>
+    <div className="arch arch-shadow relative mx-auto w-full max-w-[380px] overflow-hidden border border-line bg-surface">
+      {/* dome: the twin taking shape */}
+      <div className="flex flex-col items-center bg-[radial-gradient(120%_100%_at_50%_0%,#e4ede9_0%,transparent_70%)] px-8 pb-5 pt-14">
+        <div className={`orb h-24 w-24 ${busy ? "orb--thinking" : ""}`} />
+        <p className="font-display mt-4 text-xl font-medium">
+          {name.trim() ? `${name.trim()}'s twin` : "Your twin"}
+        </p>
+        <p className="mt-0.5 text-xs text-inkfaint">
+          born in ~30 seconds · no account · lasts 24h
+        </p>
       </div>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Your first name"
-        className="mb-3 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-      />
-      <div className="mb-2 flex gap-2 text-xs">
-        {(["manual", "blog"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`rounded-full border px-3 py-1.5 transition ${
-              mode === m
-                ? "border-ink bg-ink text-paper"
-                : "border-line bg-surface text-inksoft hover:border-accent"
-            }`}
-          >
-            {m === "manual" ? "Paste text about you" : "Blog / article URL"}
-          </button>
-        ))}
-      </div>
-      {mode === "manual" ? (
-        <textarea
-          value={payload}
-          onChange={(e) => setPayload(e.target.value)}
-          rows={4}
-          placeholder="Paste a bio, an essay you wrote, notes — anything in your voice…"
-          className="w-full resize-none rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-        />
-      ) : (
+
+      <div className="px-6 pb-6">
         <input
-          value={payload}
-          onChange={(e) => setPayload(e.target.value)}
-          placeholder="https://yourblog.com/a-post-you-wrote"
-          className="w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your first name"
+          className="mb-2.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent2"
         />
-      )}
-      {error && <p className="mt-2 text-xs text-accent2">{error}</p>}
-      <button
-        onClick={build}
-        disabled={busy}
-        className="mt-4 w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
-      >
-        {busy ? "Building your preview twin…" : "Meet your twin →"}
-      </button>
+        <div className="mb-2 flex gap-1.5 text-xs">
+          {(["manual", "blog"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`rounded-full border px-3 py-1.5 transition ${
+                mode === m
+                  ? "border-ink bg-ink text-paper"
+                  : "border-line bg-surface text-inksoft hover:border-accent2"
+              }`}
+            >
+              {m === "manual" ? "Paste your writing" : "Blog / article URL"}
+            </button>
+          ))}
+        </div>
+        {mode === "manual" ? (
+          <textarea
+            value={payload}
+            onChange={(e) => setPayload(e.target.value)}
+            rows={3}
+            placeholder="A bio, an essay, notes — anything in your voice…"
+            className="w-full resize-none rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent2"
+          />
+        ) : (
+          <input
+            value={payload}
+            onChange={(e) => setPayload(e.target.value)}
+            placeholder="https://yourblog.com/a-post-you-wrote"
+            className="w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent2"
+          />
+        )}
+        {error && <p className="mt-2 text-xs text-accent2">{error}</p>}
+        <button
+          onClick={build}
+          disabled={busy}
+          className="btn-warm mt-3.5 w-full px-6 py-3 text-sm disabled:opacity-50"
+        >
+          {busy ? "Building your preview twin…" : "Meet your twin →"}
+        </button>
+      </div>
     </div>
   );
 }

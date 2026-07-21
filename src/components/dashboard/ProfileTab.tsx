@@ -56,7 +56,7 @@ export default function ProfileTab({ twin }: { twin: TwinRecord }) {
 
   return (
     <section className="rounded-3xl border border-line bg-surface p-6">
-      <h2 className="font-semibold">Public profile</h2>
+      <h2 className="font-display text-lg font-medium">Public profile</h2>
       <p className="mt-1 text-sm text-inksoft">
         What visitors see at hiy.ai/{twin.slug}.
       </p>

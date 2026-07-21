@@ -18,7 +18,7 @@ export default function ShareTab({ twin }: { twin: TwinRecord }) {
 
   return (
     <section className="rounded-3xl border border-line bg-surface p-6">
-      <h2 className="font-semibold">Share your twin</h2>
+      <h2 className="font-display text-lg font-medium">Share your twin</h2>
 
       <h3 className="mt-5 text-sm font-semibold">Public link</h3>
       <div className="mt-2 flex items-center gap-2">

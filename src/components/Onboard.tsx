@@ -35,13 +35,16 @@ export default function Onboard() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-8 shadow-[0_10px_34px_rgba(28,27,24,.07)]">
-        <div className="orb mb-5 h-14 w-14" />
-        <h1 className="font-display text-2xl font-medium">Claim your twin</h1>
-        <p className="mt-1.5 text-sm text-inksoft">
-          Pick your public URL — this is where people will meet your twin.
-        </p>
+    <main className="flex min-h-screen items-center justify-center px-6 py-10">
+      <div className="arch arch-shadow w-full max-w-md overflow-hidden border border-line bg-surface">
+        <div className="flex flex-col items-center bg-[radial-gradient(120%_100%_at_50%_0%,#e4ede9_0%,transparent_70%)] px-8 pb-2 pt-12 text-center">
+          <div className="orb mb-4 h-16 w-16" />
+          <h1 className="font-display text-2xl font-medium">Claim your twin</h1>
+          <p className="mt-1.5 text-sm text-inksoft">
+            Pick your public URL — this is where people will meet your twin.
+          </p>
+        </div>
+        <div className="px-8 pb-8">
         <div className="mt-5 flex items-center rounded-xl border border-line bg-paper px-4 py-2.5 text-sm focus-within:border-accent">
           <span className="text-inkfaint">hiy.ai/</span>
           <input
@@ -78,10 +81,11 @@ export default function Onboard() {
         <button
           onClick={create}
           disabled={busy || !confirmed || !username || !name}
-          className="mt-5 w-full rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+          className="btn-warm mt-5 w-full px-6 py-3 text-sm disabled:opacity-40"
         >
           {busy ? "Creating…" : "Create my twin →"}
         </button>
+        </div>
       </div>
     </main>
   );
