@@ -19,7 +19,7 @@ import {
   completeText,
 } from "@/lib/llm/provider";
 
-export { buildSystemPrompt, type RetrievedChunk } from "./prompt";
+export { type RetrievedChunk } from "./prompt";
 import type { RetrievedChunk } from "./prompt";
 
 /**
@@ -27,7 +27,10 @@ import type { RetrievedChunk } from "./prompt";
  * Best-effort: returns null (and leaves the twin untouched) without an LLM
  * key or on unparseable output — chat degrades to the persona-less prompt.
  */
-export async function synthesizePersona(twinId: string): Promise<PersonaProfile | null> {
+export async function synthesizePersona(
+  twinId: string,
+  task: "synthesis" | "light" = "synthesis"
+): Promise<PersonaProfile | null> {
   if (activeChatProvider() === "none") return null;
   const db = supabaseAdmin();
   const { data: sources } = await db
@@ -42,7 +45,7 @@ export async function synthesizePersona(twinId: string): Promise<PersonaProfile 
     prompt: personaPromptInput(
       sources.map((s) => ({ title: s.title, type: s.type, text: s.raw_text }))
     ),
-    task: "synthesis",
+    task,
     maxTokens: 1200,
   });
   const persona = parsePersona(raw);
@@ -81,9 +84,10 @@ export async function reindexTwin(twinId: string): Promise<number> {
       .filter((s) => s.type === "correction")
       .map((s) => ({ ...s, title: `[AUTHORITATIVE CORRECTION] ${s.title}` })),
   ];
+  const task = twinRow?.is_ephemeral ? ("light" as const) : ("synthesis" as const);
   const wiki = await synthesizeWiki(
     ordered.map((s) => ({ title: s.title, type: s.type, text: s.raw_text })),
-    twinRow?.is_ephemeral ? "light" : "synthesis"
+    task
   );
   await db
     .from("wikis")
@@ -114,7 +118,7 @@ export async function reindexTwin(twinId: string): Promise<number> {
   // that signal exists. Failure here must never fail indexing.
   if (sources.some((s) => s.type === "interview" || s.type === "correction")) {
     try {
-      await synthesizePersona(twinId);
+      await synthesizePersona(twinId, task);
     } catch (e) {
       console.error("persona synthesis failed (non-fatal)", e);
     }

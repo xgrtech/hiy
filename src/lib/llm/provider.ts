@@ -8,7 +8,14 @@
  */
 import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
-import { embedMany, embed, generateText, streamText, type ModelMessage } from "ai";
+import {
+  embedMany,
+  embed,
+  generateText,
+  streamText,
+  type ModelMessage,
+  type SystemModelMessage,
+} from "ai";
 
 export type ChatProvider = "anthropic" | "openai" | "none";
 
@@ -79,9 +86,10 @@ export function streamChat(opts: {
   maxTokens?: number;
   onFinish?: (text: string) => Promise<void> | void;
 }) {
-  // Cache control rides on a system message; OpenAI ignores the anthropic
-  // provider options, so the same shape works on the fallback path.
-  const systemMessages: ModelMessage[] =
+  // Cache control rides on system messages passed via the `system` option —
+  // the SDK rejects role:"system" entries inside `messages` at runtime.
+  // OpenAI ignores the anthropic provider options on the fallback path.
+  const system: SystemModelMessage[] =
     typeof opts.system === "string"
       ? [{ role: "system", content: opts.system }]
       : [
@@ -98,7 +106,8 @@ export function streamChat(opts: {
         ];
   return streamText({
     model: modelFor("chat"),
-    messages: [...systemMessages, ...opts.messages],
+    system,
+    messages: opts.messages,
     maxOutputTokens: opts.maxTokens ?? 800,
     onFinish: async ({ text }) => {
       await opts.onFinish?.(text);
