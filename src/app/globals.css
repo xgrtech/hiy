@@ -8,7 +8,7 @@
   --surface-2: #e9e4dc;
   --ink: #211d18;
   --ink-soft: #6b645b;
-  --ink-faint: #9a938a;
+  --ink-faint: #7c746a; /* darkened from #9a938a for legibility on paper */
   --line: #e2ddd4;
   --dark: #211d18;
   --accent: #c2542f; /* terracotta — THE accent */

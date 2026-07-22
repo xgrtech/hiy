@@ -3,8 +3,10 @@
  *  tiles), a live/draft hero, recent conversations, and the teach queue.
  *  All real data. */
 import { useState } from "react";
-import { Copy, Check, ArrowRight, MessageSquare } from "lucide-react";
+import { Copy, Check, Sparkles } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import PublishButton from "./PublishButton";
+import OnboardingChecklist from "./OnboardingChecklist";
 import type { TwinRecord, SourceRecord, AppStats } from "./types";
 import type { ViewKey } from "../Dashboard";
 
@@ -35,6 +37,7 @@ export default function DashboardHome({
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const isLive = twin.status === "live";
   const hasContent = sources.length > 0;
+  const hasInterview = sources.some((s) => s.type === "interview");
 
   function copyLink() {
     navigator.clipboard?.writeText(`${origin}/${twin.slug}`);
@@ -64,77 +67,60 @@ export default function DashboardHome({
         </p>
       </header>
 
-      {/* live → share bar · draft+content → ready to publish · draft empty → bring-to-life */}
-      {isLive ? (
-        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface p-3 pl-5">
-          <span className="flex items-center gap-2 text-sm">
-            <span className="h-2 w-2 rounded-full bg-green" />
-            <span className="text-inksoft">Live at</span>
-            <b className="font-medium">hiy.ai/{twin.slug}</b>
-          </span>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <button
-              onClick={copyLink}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-inksoft transition hover:border-ink hover:text-ink"
-            >
-              {copied ? <Check className="h-3.5 w-3.5 text-green" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy link"}
-            </button>
-            <button
-              onClick={openSettings}
-              className="rounded-full px-3 py-1.5 text-xs font-medium text-inksoft transition hover:text-ink"
-            >
-              Embed →
-            </button>
-            <PublishButton
-              publish={false}
-              className="rounded-full px-3 py-1.5 text-xs font-medium text-inkfaint transition hover:text-accent"
-            >
-              Unpublish
-            </PublishButton>
-          </div>
-        </div>
-      ) : hasContent ? (
-        <div className="beam dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
-          <span className="orb h-14 w-14" aria-hidden />
-          <div>
-            <h2 className="font-display text-2xl">Ready when you are</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-inksoft">
-              Your hiy has learned from {sources.length} source{sources.length === 1 ? "" : "s"}.
-              Review it privately, then publish to make hiy.ai/{twin.slug} public.
-            </p>
-          </div>
-          <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
-            <a
-              href={`/${twin.slug}?preview=1`}
-              target="_blank"
-              rel="noreferrer"
-              className="press rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
-            >
-              Preview privately
-            </a>
-            <PublishButton publish className="btn-warm press px-6 py-2.5 text-sm">
-              Publish
-            </PublishButton>
-          </div>
-        </div>
+      {/* draft → activation checklist · live → share bar (+ voice nudge) */}
+      {!isLive ? (
+        <OnboardingChecklist
+          slug={twin.slug}
+          hasContent={hasContent}
+          hasInterview={hasInterview}
+          sourceCount={sources.length}
+          onAddContent={() => go("training")}
+          onTeachVoice={() => go("refine")}
+        />
       ) : (
-        <div className="beam dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
-          <span className="orb h-14 w-14" aria-hidden />
-          <div>
-            <h2 className="font-display text-2xl">Bring your hiy to life</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-inksoft">
-              Add a blog post, a video, or a few paragraphs in your voice —
-              then review and publish it when it sounds like you.
-            </p>
+        <>
+          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface p-3 pl-5">
+            <span className="flex items-center gap-2 text-sm">
+              <span className="h-2 w-2 rounded-full bg-green" />
+              <span className="text-inksoft">Live at</span>
+              <b className="font-medium">hiy.ai/{twin.slug}</b>
+            </span>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <button
+                onClick={copyLink}
+                className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-inksoft transition hover:border-ink hover:text-ink"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-green" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy link"}
+              </button>
+              <button
+                onClick={openSettings}
+                className="rounded-full px-3 py-1.5 text-xs font-medium text-inksoft transition hover:text-ink"
+              >
+                Embed →
+              </button>
+              <PublishButton
+                publish={false}
+                className="rounded-full px-3 py-1.5 text-xs font-medium text-inkfaint transition hover:text-accent"
+              >
+                Unpublish
+              </PublishButton>
+            </div>
           </div>
-          <button
-            onClick={() => go("training")}
-            className="btn-warm press mt-1 inline-flex items-center gap-2 px-6 py-2.5 text-sm"
-          >
-            Add your first content <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+          {!hasInterview && (
+            <button
+              onClick={() => go("refine")}
+              className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-dashed border-accent/40 bg-accentsoft/40 px-5 py-3 text-left transition hover:bg-accentsoft"
+            >
+              <Sparkles className="h-4 w-4 shrink-0 text-accent" />
+              <span className="text-sm text-inksoft">
+                <b className="text-ink">Make it sound more like you</b> — a 2-minute voice
+                interview sharpens how your hiy phrases answers.
+              </span>
+              <span className="ml-auto text-xs font-semibold text-accent">Start →</span>
+            </button>
+          )}
+        </>
       )}
 
       {/* one stat object, four readings — not four identical cards */}
