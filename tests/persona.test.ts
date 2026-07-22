@@ -81,6 +81,28 @@ async function main() {
     );
   });
 
+  await test("personaPromptInput excerpts long content sources (style sample, not corpus)", () => {
+    const long = "filler ".repeat(3000) + "TAIL_MARKER_NEVER_INCLUDED";
+    const input = personaPromptInput([
+      { title: "Long blog", type: "blog", text: long },
+      { title: "Personality interview", type: "interview", text: "Q: A?\nA: B" },
+    ]);
+    assert.ok(!input.includes("TAIL_MARKER_NEVER_INCLUDED"), "long blog should be excerpted");
+    assert.ok(input.includes("Long blog"), "excerpted source still present");
+    assert.ok(input.includes("Q: A?"), "interview untouched");
+  });
+
+  await test("personaPromptInput keeps interviews and corrections whole", () => {
+    const interview = "Q: X?\nA: " + "detail ".repeat(1200) + "INTERVIEW_TAIL";
+    const correction = "I left Acme in 2024. " + "context ".repeat(1000) + "CORRECTION_TAIL";
+    const input = personaPromptInput([
+      { title: "Personality interview", type: "interview", text: interview },
+      { title: "Fix", type: "correction", text: correction },
+    ]);
+    assert.ok(input.includes("INTERVIEW_TAIL"), "interview must never be excerpted");
+    assert.ok(input.includes("CORRECTION_TAIL"), "corrections must never be excerpted");
+  });
+
   const { safePersona } = await import("../src/lib/rag/persona");
   await test("safePersona validates untrusted jsonb (null on malformed)", () => {
     assert.ok(safePersona(validPersona));
@@ -126,6 +148,21 @@ async function main() {
     const rulesIdx = p.indexOf("Non-negotiable rules");
     const personaIdx = p.indexOf("HOW YOU SPEAK");
     assert.ok(rulesIdx < personaIdx, "rules come before persona style");
+  });
+
+  const { buildSystemPromptParts } = await import("../src/lib/rag/prompt");
+  await test("prompt splits into cacheable core + per-question context", () => {
+    const { core, context } = buildSystemPromptParts({ ...baseOpts, persona: validPersona });
+    assert.ok(core.includes("AI twin of Zee"), "identity in core");
+    assert.ok(core.includes("HOW YOU SPEAK"), "persona in core");
+    assert.ok(!core.includes("I like tea"), "retrieved chunks must not pollute the cached core");
+    assert.ok(context.includes("I like tea"), "chunks live in the variable context part");
+  });
+
+  await test("buildSystemPrompt is exactly core + context (no drift between paths)", () => {
+    const parts = buildSystemPromptParts({ ...baseOpts, persona: validPersona });
+    const joined = buildSystemPrompt({ ...baseOpts, persona: validPersona });
+    assert.equal(joined, `${parts.core}\n\n${parts.context}`);
   });
 
   // ---------- interview/format.ts ----------

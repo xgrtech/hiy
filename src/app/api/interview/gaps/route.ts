@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
     const raw = await completeText({
       system: SYSTEM,
       prompt: wiki.markdown.slice(0, 100_000),
+      task: "light",
       maxTokens: 600,
     });
     const start = raw.indexOf("[");

@@ -1,6 +1,9 @@
 /**
  * Provider-agnostic LLM layer on the Vercel AI SDK.
  * Chat: Anthropic preferred when both keys exist, else OpenAI.
+ * Models are tiered by task: chat is the volume path (Sonnet), wiki/persona
+ * synthesis is rare but deep (Opus), previews and gap questions are frequent
+ * and disposable (Haiku).
  * Embeddings: OpenAI text-embedding-3-small (1536-dim, matches pgvector).
  */
 import { anthropic } from "@ai-sdk/anthropic";
@@ -8,6 +11,22 @@ import { openai } from "@ai-sdk/openai";
 import { embedMany, embed, generateText, streamText, type ModelMessage } from "ai";
 
 export type ChatProvider = "anthropic" | "openai" | "none";
+
+/** chat: visitor messages · synthesis: wiki/persona rebuilds · light: previews + gap questions */
+export type LlmTask = "chat" | "synthesis" | "light";
+
+const MODELS: Record<Exclude<ChatProvider, "none">, Record<LlmTask, string>> = {
+  anthropic: {
+    chat: "claude-sonnet-5",
+    synthesis: "claude-opus-4-8",
+    light: "claude-haiku-4-5",
+  },
+  openai: {
+    chat: "gpt-4o",
+    synthesis: "gpt-4o",
+    light: "gpt-4o-mini",
+  },
+};
 
 export function activeChatProvider(): ChatProvider {
   if (process.env.ANTHROPIC_API_KEY) return "anthropic";
@@ -19,10 +38,10 @@ export function embeddingsConfigured(): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
-function chatModel() {
+function modelFor(task: LlmTask) {
   const p = activeChatProvider();
-  if (p === "anthropic") return anthropic("claude-sonnet-4-5");
-  if (p === "openai") return openai("gpt-4o-mini");
+  if (p === "anthropic") return anthropic(MODELS.anthropic[task]);
+  if (p === "openai") return openai(MODELS.openai[task]);
   throw new Error(
     "No LLM configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY."
   );
@@ -33,10 +52,11 @@ const embeddingModel = () => openai.textEmbeddingModel("text-embedding-3-small")
 export async function completeText(opts: {
   system: string;
   prompt: string;
+  task?: LlmTask;
   maxTokens?: number;
 }): Promise<string> {
   const { text } = await generateText({
-    model: chatModel(),
+    model: modelFor(opts.task ?? "synthesis"),
     system: opts.system,
     prompt: opts.prompt,
     maxOutputTokens: opts.maxTokens ?? 2000,
@@ -44,16 +64,41 @@ export async function completeText(opts: {
   return text;
 }
 
+export interface ChatSystem {
+  /** Stable per twin (identity + rules + persona) — prompt-cached at Anthropic,
+   *  so every follow-up turn and every concurrent visitor of the same twin
+   *  reads it at 10% of the input price. */
+  cached: string;
+  /** Per-question retrieved context — changes every turn, never cached. */
+  dynamic?: string;
+}
+
 export function streamChat(opts: {
-  system: string;
+  system: string | ChatSystem;
   messages: ModelMessage[];
   maxTokens?: number;
   onFinish?: (text: string) => Promise<void> | void;
 }) {
+  // Cache control rides on a system message; OpenAI ignores the anthropic
+  // provider options, so the same shape works on the fallback path.
+  const systemMessages: ModelMessage[] =
+    typeof opts.system === "string"
+      ? [{ role: "system", content: opts.system }]
+      : [
+          {
+            role: "system",
+            content: opts.system.cached,
+            providerOptions: {
+              anthropic: { cacheControl: { type: "ephemeral" } },
+            },
+          },
+          ...(opts.system.dynamic
+            ? [{ role: "system" as const, content: opts.system.dynamic }]
+            : []),
+        ];
   return streamText({
-    model: chatModel(),
-    system: opts.system,
-    messages: opts.messages,
+    model: modelFor("chat"),
+    messages: [...systemMessages, ...opts.messages],
     maxOutputTokens: opts.maxTokens ?? 800,
     onFinish: async ({ text }) => {
       await opts.onFinish?.(text);

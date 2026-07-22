@@ -1,5 +1,5 @@
 /** Karpathy-style wiki synthesis: raw sources → one structured markdown doc. */
-import { activeChatProvider, completeText } from "@/lib/llm/provider";
+import { activeChatProvider, completeText, type LlmTask } from "@/lib/llm/provider";
 
 const SYSTEM = `You are building a structured personal knowledge base ("wiki") about a specific person from raw source material they provided about themselves (blog posts, video transcripts, résumé text, notes).
 
@@ -8,7 +8,10 @@ Rewrite and organize it into clean markdown with topic headings adapted to the m
 Sources titled "[AUTHORITATIVE CORRECTION]" are fixes the person made to their own knowledge base: where they conflict with other material, the correction wins — apply it and drop the outdated claim.`;
 
 export async function synthesizeWiki(
-  sources: { title: string; type: string; text: string }[]
+  sources: { title: string; type: string; text: string }[],
+  // Ephemeral preview twins get the light model: they last 24h and exist to
+  // demo the product, not to be the product.
+  task: LlmTask = "synthesis"
 ): Promise<string> {
   const combined = sources
     .map((s) => `### Source: ${s.title} (${s.type})\n${s.text}`)
@@ -23,6 +26,7 @@ export async function synthesizeWiki(
   return completeText({
     system: SYSTEM,
     prompt: `Raw source material:\n\n${combined}\n\nProduce the structured markdown wiki now.`,
+    task,
     maxTokens: 4000,
   });
 }

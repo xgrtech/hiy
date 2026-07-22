@@ -2,7 +2,8 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { retrieve, buildSystemPrompt } from "@/lib/rag/engine";
+import { retrieve } from "@/lib/rag/engine";
+import { buildSystemPromptParts } from "@/lib/rag/prompt";
 import { safePersona } from "@/lib/rag/persona";
 import { streamChat, activeChatProvider } from "@/lib/llm/provider";
 import { capsForTwin, checkAndCountMessage } from "@/lib/caps";
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
   }
 
   const chunks = await retrieve(twin.id, message, 6);
-  const system = buildSystemPrompt({
+  const { core, context } = buildSystemPromptParts({
     name: twin.name,
     roleLine: twin.role_line,
     guardrailTopics: (twin.guardrail_topics as string[]) ?? [],
@@ -93,8 +94,11 @@ export async function POST(req: NextRequest) {
 
   const sources = [...new Set(chunks.filter((c) => c.similarity > 0.25).map((c) => c.source_title))].slice(0, 3);
 
+  // Split system prompt: the twin's identity/persona part is stable, so it
+  // prompt-caches across turns and across concurrent visitors of this twin;
+  // only the retrieved context varies per question.
   const result = streamChat({
-    system,
+    system: { cached: core, dynamic: context },
     messages: [...history, { role: "user" as const, content: message }],
     onFinish: async (text) => {
       if (sid) {

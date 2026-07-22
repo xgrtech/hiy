@@ -44,6 +44,19 @@ Return ONLY a JSON object with exactly these keys:
 Only include what the material supports — never invent. Interview answers are the highest-signal material. Sources titled "[AUTHORITATIVE CORRECTION]" are fixes the person made later: where they conflict with anything else (including boundaries and facts), the correction wins. No text outside the JSON object.`;
 
 /**
+ * Content sources are style *samples*: ~1,500 words carry a person's voice,
+ * and persona synthesis must never re-read the whole corpus (facts live in
+ * retrieval). Interviews and corrections stay whole — they are small,
+ * user-authored, and authoritative.
+ */
+const SOURCE_EXCERPT_CHARS = 6000;
+
+function styleExcerpt(text: string): string {
+  if (text.length <= SOURCE_EXCERPT_CHARS) return text;
+  return `${text.slice(0, SOURCE_EXCERPT_CHARS)}\n[…excerpt — full text lives in the knowledge base]`;
+}
+
+/**
  * Build the synthesis input: interviews first (highest signal), corrections
  * last with an authoritative marker (they override everything before them).
  */
@@ -52,7 +65,9 @@ export function personaPromptInput(
 ): string {
   const ordered = [
     ...sources.filter((s) => s.type === "interview"),
-    ...sources.filter((s) => s.type !== "interview" && s.type !== "correction"),
+    ...sources
+      .filter((s) => s.type !== "interview" && s.type !== "correction")
+      .map((s) => ({ ...s, text: styleExcerpt(s.text) })),
     ...sources
       .filter((s) => s.type === "correction")
       .map((s) => ({ ...s, title: `[AUTHORITATIVE CORRECTION] ${s.title}` })),

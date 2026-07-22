@@ -42,6 +42,7 @@ export async function synthesizePersona(twinId: string): Promise<PersonaProfile 
     prompt: personaPromptInput(
       sources.map((s) => ({ title: s.title, type: s.type, text: s.raw_text }))
     ),
+    task: "synthesis",
     maxTokens: 1200,
   });
   const persona = parsePersona(raw);
@@ -52,6 +53,12 @@ export async function synthesizePersona(twinId: string): Promise<PersonaProfile 
 /** Rebuild a twin's wiki + chunk index from all its sources. */
 export async function reindexTwin(twinId: string): Promise<number> {
   const db = supabaseAdmin();
+
+  const { data: twinRow } = await db
+    .from("twins")
+    .select("is_ephemeral")
+    .eq("id", twinId)
+    .single();
 
   const { data: sources, error } = await db
     .from("sources")
@@ -75,7 +82,8 @@ export async function reindexTwin(twinId: string): Promise<number> {
       .map((s) => ({ ...s, title: `[AUTHORITATIVE CORRECTION] ${s.title}` })),
   ];
   const wiki = await synthesizeWiki(
-    ordered.map((s) => ({ title: s.title, type: s.type, text: s.raw_text }))
+    ordered.map((s) => ({ title: s.title, type: s.type, text: s.raw_text })),
+    twinRow?.is_ephemeral ? "light" : "synthesis"
   );
   await db
     .from("wikis")
