@@ -93,7 +93,7 @@ export default function PricingPage() {
         {TIERS.map((t) => (
           <div
             key={t.name}
-            className={`relative rounded-2xl border p-6 ${
+            className={`lift relative rounded-2xl border p-6 ${
               t.dark
                 ? "border-dark bg-dark text-white shadow-[0_24px_60px_rgba(33,29,24,.25)]"
                 : "border-line bg-surface"

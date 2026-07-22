@@ -314,6 +314,29 @@ body:has(.wash-none)::before {
   box-shadow: 0 14px 40px rgba(33, 29, 24, 0.1);
 }
 
+/* On-view choreography (bars/chips inside cards). .ov-prep is ONLY added
+   by JS after hydration — without JS everything stays visible — and .ov-in
+   plays the entrance. Stagger via --i set inline per element. */
+.ov-prep .ov-bar {
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+.ov-in .ov-bar {
+  transform: scaleY(1);
+  transition: transform 0.55s var(--ease-out-quint);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+.ov-prep .ov-chip {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.ov-in .ov-chip {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.45s var(--ease-out-quint), transform 0.45s var(--ease-out-quint);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
 /* ---------- chat ---------- */
 .bubble-in {
   animation: fade-up 0.4s var(--ease-out-quint) both;
@@ -356,4 +379,9 @@ body:has(.wash-none)::before {
   .reveal { opacity: 1; transform: none; transition: none; }
   .btn-warm, .press, .lift { transition: none; }
   .lift:hover { transform: none; }
+  .ov-prep .ov-bar, .ov-prep .ov-chip {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

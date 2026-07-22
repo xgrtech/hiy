@@ -1,20 +1,36 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import InstantTwin from "@/components/InstantTwin";
 import ParticleWordmark from "@/components/fx/ParticleWordmark";
+import ExampleTwinCard from "@/components/fx/ExampleTwinCard";
+import OnView from "@/components/fx/OnView";
 
 /* Landing per "Hiy Mockups.dc.html" §1a — warm & human, one terracotta
    accent, Instrument Serif display. Copy adapted to shipped features only
    (no voice/email claims yet). */
 
-const FEATURES = [
+/* The two signature behaviors get featured cards that show the real UI
+   artifact; the rest stay compact. Breaks the identical-grid monotony. */
+const FEATURED = [
   {
     t: "Cites its sources",
     d: "Every grounded answer links back to the talk, post, or chapter it came from — by default, never a paid add-on.",
+    artifact: (
+      <span className="chip-cite">⌘ From: Pricing 101 — blog</span>
+    ),
   },
   {
     t: "Says “I don't know”",
     d: "When a question falls outside your content, your hiy admits it in your tone instead of improvising in your name.",
+    artifact: (
+      <span className="inline-block rounded-xl border-[1.5px] border-dashed border-line px-3 py-1.5 text-xs text-inksoft">
+        I don&apos;t have that in my knowledge yet.
+      </span>
+    ),
   },
+];
+
+const FEATURES = [
   {
     t: "Sounds like you",
     d: "A short interview distills your tone, takes, and boundaries into a persona — answers phrased the way you'd phrase them.",
@@ -39,8 +55,12 @@ const STEPS = [
     d: "Paste links, sync your blog or YouTube, drop in PDFs. It builds from what you've already made.",
     art: (
       <div className="flex flex-wrap gap-1.5">
-        {["Blog · 46 posts", "YouTube · 84", "PDF", "Interview"].map((c) => (
-          <span key={c} className="rounded-full border border-white/15 px-2.5 py-1 text-[10px] text-white/60">
+        {["Blog · 46 posts", "YouTube · 84", "PDF", "Interview"].map((c, i) => (
+          <span
+            key={c}
+            style={{ "--i": i } as CSSProperties}
+            className="ov-chip rounded-full border border-white/15 px-2.5 py-1 text-[10px] text-white/60"
+          >
             {c}
           </span>
         ))}
@@ -53,7 +73,11 @@ const STEPS = [
     art: (
       <div className="flex h-8 items-end gap-1">
         {[3, 6, 4, 8, 5, 7, 3, 6, 4, 5, 7, 4].map((h, i) => (
-          <span key={i} className="w-1.5 rounded-full bg-accent/70" style={{ height: `${h * 4}px` }} />
+          <span
+            key={i}
+            className="ov-bar w-1.5 rounded-full bg-accent/70"
+            style={{ height: `${h * 4}px`, "--i": i } as CSSProperties}
+          />
         ))}
       </div>
     ),
@@ -135,52 +159,42 @@ export default function Landing() {
           Make one right now — no account
         </p>
         <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-[1fr_1.2fr_1fr]">
-          {[
-            {
-              init: "MC",
-              name: "Maya Chen",
-              role: "Startup coach — example hiy",
-              qs: ["How do I price my first product?", "When should I raise vs. bootstrap?"],
-            },
-          ].map((p) => (
-            <div key={p.name} className="hidden rounded-2xl border border-line bg-surface p-5 lg:block">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent font-display text-sm text-white">
-                  {p.init}
-                </span>
-                <div>
-                  <p className="text-sm font-semibold">{p.name}</p>
-                  <p className="text-xs text-inkfaint">{p.role}</p>
-                </div>
-              </div>
-              <div className="mt-3.5 space-y-2">
-                {p.qs.map((q) => (
-                  <p key={q} className="rounded-full border border-line px-3.5 py-2 text-xs text-inksoft">
-                    {q}
-                  </p>
-                ))}
-              </div>
-            </div>
-          ))}
+          <ExampleTwinCard
+            initials="MC"
+            name="Maya Chen"
+            role="Startup coach · example"
+            avatarClass="bg-accent"
+            exchanges={[
+              {
+                q: "How do I price my first product?",
+                a: "Anchor it to the outcome, never your hours — I walk through the math in my pricing guide.",
+                cite: "Pricing 101 — blog",
+              },
+              {
+                q: "Raise or bootstrap?",
+                a: "Bootstrap until the product sells without you in the room. Then raising is a choice, not a rescue.",
+                cite: "Ep. 12 — Raise vs bootstrap",
+              },
+            ]}
+          />
           <InstantTwin />
-          <div className="hidden rounded-2xl border border-line bg-surface p-5 lg:block">
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-green font-display text-sm text-white">
-                AO
-              </span>
-              <div>
-                <p className="text-sm font-semibold">Dr. Ade Okafor</p>
-                <p className="text-xs text-inkfaint">Nutrition educator — example hiy</p>
-              </div>
-            </div>
-            <div className="mt-3.5 space-y-2">
-              {["Is intermittent fasting right for me?", "What does your book say about sugar?"].map((q) => (
-                <p key={q} className="rounded-full border border-line px-3.5 py-2 text-xs text-inksoft">
-                  {q}
-                </p>
-              ))}
-            </div>
-          </div>
+          <ExampleTwinCard
+            initials="AO"
+            name="Dr. Ade Okafor"
+            role="Nutritionist · example"
+            avatarClass="bg-green"
+            exchanges={[
+              {
+                q: "What does your book say about sugar?",
+                a: "Cut the drinkable sugar first — that's chapter four's whole argument.",
+                cite: "The Balanced Plate, ch. 4",
+              },
+              {
+                q: "What's your take on keto for athletes?",
+                a: "I don't have that in Ade's knowledge yet — try the book's chapters on everyday nutrition instead.",
+              },
+            ]}
+          />
         </div>
       </section>
 
@@ -193,9 +207,12 @@ export default function Landing() {
           <p className="mt-2 text-center text-sm text-white/60">
             Feed it your content. It learns your voice. Share it with the world.
           </p>
-          <div className="mt-12 grid gap-5 md:grid-cols-3">
+          <OnView className="mt-12 grid gap-5 md:grid-cols-3">
             {STEPS.map((s) => (
-              <div key={s.n} className="h-full rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+              <div
+                key={s.n}
+                className="h-full rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.06]"
+              >
                 <p className="font-display text-lg text-accent">{s.n}</p>
                 <div className="mt-4 flex min-h-14 items-center rounded-xl border border-white/8 bg-white/[0.03] p-3.5">
                   {s.art}
@@ -203,7 +220,7 @@ export default function Landing() {
                 <p className="mt-4 text-sm leading-relaxed text-white/70">{s.d}</p>
               </div>
             ))}
-          </div>
+          </OnView>
         </div>
       </section>
 
@@ -212,9 +229,24 @@ export default function Landing() {
         <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)]">
           More than a chatbot
         </h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-12">
+          {FEATURED.map((f) => (
+            <div
+              key={f.t}
+              className="lift h-full rounded-2xl border border-line bg-surface p-6 transition-colors hover:border-accent/40 lg:col-span-6"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <h3 className="font-display text-xl">{f.t}</h3>
+                {f.artifact}
+              </div>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-inksoft">{f.d}</p>
+            </div>
+          ))}
           {FEATURES.map((f) => (
-            <div key={f.t} className="lift h-full rounded-2xl border border-line bg-surface p-5">
+            <div
+              key={f.t}
+              className="lift h-full rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-accent/40 lg:col-span-3"
+            >
               <h3 className="text-[15px] font-semibold">{f.t}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-inksoft">{f.d}</p>
             </div>
