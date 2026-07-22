@@ -22,6 +22,8 @@ import {
   ChevronsUpDown,
   Sun,
   Moon,
+  Menu,
+  X,
 } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { currentTheme, toggleTheme, type Theme } from "@/lib/theme";
@@ -82,6 +84,7 @@ export default function Dashboard({
   const [view, setView] = useState<ViewKey>("home");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false); // mobile drawer
   const [theme, setThemeState] = useState<Theme>("light");
   useEffect(() => setThemeState(currentTheme()), []);
   const hasInterview = sources.some((s) => s.type === "interview");
@@ -104,22 +107,60 @@ export default function Dashboard({
 
   return (
     <main className="wash-dawn flex min-h-screen bg-paper">
-      {/* rail */}
-      <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col border-r border-line bg-surface lg:w-60">
-        <div className="flex items-center gap-2 px-4 pb-5 pt-5 lg:px-5">
-          <Link href="/" className="font-display text-xl">
+      {/* mobile top bar */}
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-line bg-surface px-4 py-3 lg:hidden">
+        <button
+          onClick={() => setNavOpen(true)}
+          aria-label="Open menu"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-inksoft transition hover:bg-paper"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <Link href="/" className="font-display text-lg">
+          hiy<span className="text-accent">.ai</span>
+        </Link>
+        <span className="h-9 w-9">{avatar}</span>
+      </header>
+
+      {/* backdrop (mobile, when drawer open) */}
+      {navOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px] lg:hidden"
+          onClick={() => setNavOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      {/* rail — static on desktop, slide-in drawer on mobile */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col border-r border-line bg-surface transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:w-60 lg:translate-x-0 ${
+          navOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between px-5 pb-5 pt-5">
+          <Link href="/" className="font-display text-xl" onClick={() => setNavOpen(false)}>
             hiy<span className="text-accent">.ai</span>
           </Link>
+          <button
+            onClick={() => setNavOpen(false)}
+            aria-label="Close menu"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-inksoft transition hover:bg-paper lg:hidden"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 px-2.5 lg:px-3">
+        <nav className="flex flex-1 flex-col gap-0.5 px-3">
           {NAV.map(({ key, label, Icon }) => {
             const active = view === key;
             return (
               <button
                 key={key}
-                onClick={() => setView(key)}
-                className={`group flex items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm transition ${
+                onClick={() => {
+                  setView(key);
+                  setNavOpen(false);
+                }}
+                className={`group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-left text-sm transition ${
                   active
                     ? "bg-paper font-medium text-ink"
                     : "text-inksoft hover:bg-paper/70 hover:text-ink"
@@ -129,12 +170,12 @@ export default function Dashboard({
                   className={`h-[18px] w-[18px] shrink-0 ${active ? "text-accent" : "text-inkfaint group-hover:text-inksoft"}`}
                   strokeWidth={2}
                 />
-                <span className="hidden lg:inline">{label}</span>
+                <span>{label}</span>
                 {key === "refine" && !hasInterview && (
-                  <span className="ml-auto hidden h-1.5 w-1.5 rounded-full bg-accent lg:block" />
+                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-accent" />
                 )}
                 {key === "home" && stats.needsReview > 0 && (
-                  <span className="ml-auto hidden rounded-full bg-accent px-1.5 text-[10px] font-bold text-white lg:block">
+                  <span className="ml-auto rounded-full bg-accent px-1.5 text-[10px] font-bold text-white">
                     {stats.needsReview}
                   </span>
                 )}
@@ -144,7 +185,7 @@ export default function Dashboard({
         </nav>
 
         {/* status pill */}
-        <div className="hidden px-3 pb-2 lg:block">
+        <div className="px-3 pb-2">
           <a
             href={`/${twin.slug}`}
             target="_blank"
@@ -163,15 +204,15 @@ export default function Dashboard({
         </div>
 
         {/* account menu */}
-        <div className="border-t border-line p-2.5 lg:p-3">
+        <div className="border-t border-line p-3">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex w-full items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-left transition hover:bg-paper focus:outline-none">
               {avatar}
-              <div className="hidden min-w-0 flex-1 lg:block">
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-ink">{twin.name}</p>
                 <p className="truncate text-xs text-inkfaint">Starter · free</p>
               </div>
-              <ChevronsUpDown className="hidden h-4 w-4 shrink-0 text-inkfaint lg:block" />
+              <ChevronsUpDown className="h-4 w-4 shrink-0 text-inkfaint" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" side="top" className="w-60">
               <DropdownMenuLabel>Signed in as {firstName}</DropdownMenuLabel>
@@ -214,8 +255,8 @@ export default function Dashboard({
         </div>
       </aside>
 
-      {/* content */}
-      <section className="min-w-0 flex-1 px-5 py-8 sm:px-8">
+      {/* content — extra top padding on mobile to clear the fixed top bar */}
+      <section className="min-w-0 flex-1 px-5 pb-8 pt-20 sm:px-8 lg:pt-8">
         <div className="mx-auto max-w-4xl">
           {view !== "home" && view !== "refine" && (
             <header className="mb-6">
