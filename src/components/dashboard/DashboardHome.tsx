@@ -1,7 +1,9 @@
 "use client";
-/** Dashboard home per "Hiy Mockups" §3a: greeting, stat tiles, recent
- *  conversations, share card, teach-your-hiy queue. All real data. */
+/** Dashboard home: greeting, a single stat strip (not four look-alike
+ *  tiles), a live/draft hero, recent conversations, and the teach queue.
+ *  All real data. */
 import { useState } from "react";
+import { Copy, Check, ArrowRight, MessageSquare } from "lucide-react";
 import type { TwinRecord, SourceRecord, AppStats } from "./types";
 import type { ViewKey } from "../Dashboard";
 
@@ -17,80 +19,127 @@ export default function DashboardHome({
   stats,
   sources,
   go,
+  openSettings,
 }: {
   twin: TwinRecord;
   stats: AppStats;
   sources: SourceRecord[];
   go: (v: ViewKey) => void;
+  openSettings: () => void;
 }) {
   const [copied, setCopied] = useState(false);
   const origin = typeof window === "undefined" ? "https://hiy.ai" : window.location.origin;
   const firstName = twin.name.split(" ")[0];
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const isLive = twin.status === "live";
 
-  const tiles = [
+  function copyLink() {
+    navigator.clipboard?.writeText(`${origin}/${twin.slug}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  const stat = [
     { label: "Conversations", value: stats.conversations.toLocaleString(), sub: `${stats.conversationsWeek} this week` },
     { label: "Messages", value: stats.messages.toLocaleString(), sub: "all time" },
     { label: "Training words", value: stats.trainingWords.toLocaleString(), sub: `${sources.length} sources` },
-    { label: "Needs review", value: String(stats.needsReview), sub: "unanswered questions", accent: stats.needsReview > 0 },
+    { label: "Needs review", value: String(stats.needsReview), sub: "to answer", accent: stats.needsReview > 0 },
   ];
 
   return (
     <>
-      <header className="mb-7 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-3xl">
-            {greeting}, {firstName}
-          </h1>
-          <p className="mt-1 text-sm text-inksoft">
-            {stats.conversationsWeek > 0
-              ? `Your hiy talked with ${stats.conversationsWeek} ${stats.conversationsWeek === 1 ? "person" : "people"} this week.`
-              : "Share your link — your hiy is ready to talk."}
-          </p>
-        </div>
-        <a
-          href={`/${twin.slug}`}
-          target="_blank"
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold ${
-            twin.status === "live"
-              ? "bg-greensoft text-green"
-              : "border border-line text-inksoft"
-          }`}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${twin.status === "live" ? "bg-green" : "bg-inkfaint"}`} />
-          {twin.status === "live" ? `Live at hiy.ai/${twin.slug}` : `Draft — add content to go live`}
-        </a>
+      <header className="mb-6">
+        <h1 className="font-display text-3xl">
+          {greeting}, {firstName}
+        </h1>
+        <p className="mt-1 text-sm text-inksoft">
+          {stats.conversationsWeek > 0
+            ? `Your hiy talked with ${stats.conversationsWeek} ${stats.conversationsWeek === 1 ? "person" : "people"} this week.`
+            : isLive
+              ? "Your hiy is live and ready — share your link to get talking."
+              : "One step left: add content and your hiy goes live."}
+        </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((t, i) => (
-          <div
-            key={t.label}
-            className={`anim-fade-up rounded-2xl border border-line bg-surface p-4 ${["d1", "d2", "d3", "d4"][i]}`}
+      {/* live → share bar · draft → bring-to-life hero */}
+      {isLive ? (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface p-3 pl-5">
+          <span className="flex items-center gap-2 text-sm">
+            <span className="h-2 w-2 rounded-full bg-green" />
+            <span className="text-inksoft">Live at</span>
+            <b className="font-medium">hiy.ai/{twin.slug}</b>
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={copyLink}
+              className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-inksoft transition hover:border-ink hover:text-ink"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-green" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy link"}
+            </button>
+            <button
+              onClick={openSettings}
+              className="rounded-full px-3 py-1.5 text-xs font-medium text-inksoft transition hover:text-ink"
+            >
+              Embed →
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
+          <span className="orb h-14 w-14" aria-hidden />
+          <div>
+            <h2 className="font-display text-2xl">Bring your hiy to life</h2>
+            <p className="mx-auto mt-1 max-w-md text-sm text-inksoft">
+              Add a blog post, a video, or a few paragraphs in your voice. As
+              soon as it has something to say, hiy.ai/{twin.slug} goes public.
+            </p>
+          </div>
+          <button
+            onClick={() => go("training")}
+            className="btn-warm press mt-1 inline-flex items-center gap-2 px-6 py-2.5 text-sm"
           >
-            <p className="text-xs text-inksoft">{t.label}</p>
-            <p className={`font-display mt-1.5 text-3xl ${t.accent ? "text-accent" : ""}`}>{t.value}</p>
-            <p className="mt-1 text-[11px] text-inkfaint">{t.sub}</p>
+            Add your first content <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* one stat object, four readings — not four identical cards */}
+      <div className="grid grid-cols-2 divide-y divide-line rounded-2xl border border-line bg-surface sm:grid-cols-4 sm:divide-y-0 sm:divide-x">
+        {stat.map((s) => (
+          <div key={s.label} className="px-5 py-4">
+            <p className="text-xs text-inksoft">{s.label}</p>
+            <p className={`font-display mt-1 text-3xl ${s.accent ? "text-accent" : "text-ink"}`}>
+              {s.value}
+            </p>
+            <p className="mt-0.5 text-[11px] text-inkfaint">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
         {/* recent conversations */}
         <div className="rounded-2xl border border-line bg-surface p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">Recent conversations</h2>
-            <button onClick={() => go("analytics")} className="text-xs font-medium text-accent">
-              View analytics
-            </button>
+            {stats.recent.length > 0 && (
+              <button onClick={() => go("analytics")} className="text-xs font-medium text-accent hover:underline">
+                View analytics
+              </button>
+            )}
           </div>
           {stats.recent.length === 0 ? (
-            <p className="mt-4 text-sm text-inkfaint">
-              No conversations yet — share hiy.ai/{twin.slug} to start.
-            </p>
+            <div className="mt-3 flex flex-col items-center gap-2 rounded-xl border border-dashed border-line py-8 text-center">
+              <MessageSquare className="h-5 w-5 text-inkfaint" />
+              <p className="max-w-xs text-sm text-inksoft">
+                {isLive
+                  ? `No conversations yet — share hiy.ai/${twin.slug} and they'll show up here.`
+                  : "Conversations appear here once your hiy is live."}
+              </p>
+            </div>
           ) : (
-            <ul className="mt-2 divide-y divide-line">
+            <ul className="mt-1 divide-y divide-line">
               {stats.recent.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 py-3">
                   <span className="h-2 w-2 shrink-0 rounded-full bg-accent/60" />
@@ -104,50 +153,28 @@ export default function DashboardHome({
           )}
         </div>
 
-        <div className="space-y-5">
-          {/* share card */}
-          <div className="rounded-2xl bg-dark p-5 text-white">
-            <h2 className="text-sm font-semibold">Share your hiy</h2>
-            <div className="mt-3 flex items-center gap-2 rounded-xl bg-white/10 px-3.5 py-2.5">
-              <span className="min-w-0 flex-1 truncate text-sm">hiy.ai/{twin.slug}</span>
-              <button
-                onClick={() => {
-                  navigator.clipboard?.writeText(`${origin}/${twin.slug}`);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 1500);
-                }}
-                className="rounded-lg bg-white px-3 py-1 text-xs font-semibold text-dark"
-              >
-                {copied ? "✓" : "Copy"}
-              </button>
-            </div>
-            <button onClick={() => go("settings")} className="mt-2.5 text-xs text-white/60 hover:text-white">
-              Or embed the widget on your site →
-            </button>
-          </div>
-
-          {/* teach queue */}
-          <div className="rounded-2xl border border-line bg-surface p-5">
-            <h2 className="text-sm font-semibold">Teach your hiy</h2>
-            {stats.needsReviewList.length === 0 ? (
-              <p className="mt-2 text-sm text-inkfaint">
-                Nothing unanswered — your hiy is keeping up.
+        {/* teach queue */}
+        <div className="rounded-2xl border border-line bg-surface p-5">
+          <h2 className="text-sm font-semibold">Teach your hiy</h2>
+          {stats.needsReviewList.length === 0 ? (
+            <p className="mt-2 text-sm text-inkfaint">
+              Nothing unanswered — your hiy is keeping up.
+            </p>
+          ) : (
+            <>
+              <p className="mt-2 text-sm text-inksoft">
+                It couldn&apos;t answer{" "}
+                <b className="text-accent">&ldquo;{stats.needsReviewList[0].question}&rdquo;</b>
               </p>
-            ) : (
-              <>
-                <p className="mt-2 text-sm text-inksoft">
-                  It couldn&apos;t answer{" "}
-                  <b className="text-accent">&ldquo;{stats.needsReviewList[0].question}&rdquo;</b>
-                </p>
-                <button
-                  onClick={() => go("refine")}
-                  className="mt-3 w-full rounded-full border border-accent px-4 py-2 text-xs font-semibold text-accent transition hover:bg-accentsoft"
-                >
-                  Answer it now{stats.needsReviewList.length > 1 ? ` (${stats.needsReviewList.length - 1} more)` : ""}
-                </button>
-              </>
-            )}
-          </div>
+              <button
+                onClick={() => go("refine")}
+                className="mt-3 w-full rounded-full border border-accent px-4 py-2 text-xs font-semibold text-accent transition hover:bg-accentsoft"
+              >
+                Answer it now
+                {stats.needsReviewList.length > 1 ? ` (${stats.needsReviewList.length - 1} more)` : ""}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </>
