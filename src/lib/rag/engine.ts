@@ -102,17 +102,38 @@ export async function reindexTwin(twinId: string): Promise<number> {
     embeddings = await embedTexts(chunks.map((c) => c.content));
   }
 
-  await db.from("chunks").delete().eq("twin_id", twinId);
+  // Crash-safe swap: write a NEW index version, then drop the old one only
+  // after every row lands. match_chunks reads the latest version, so a
+  // failure here leaves the previous index active instead of empty/partial.
+  const { data: verRow } = await db
+    .from("chunks")
+    .select("index_version")
+    .eq("twin_id", twinId)
+    .order("index_version", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const prevVersion = verRow?.index_version ?? 0;
+  const newVersion = prevVersion + 1;
+
   const rows = chunks.map((c, i) => ({
     twin_id: twinId,
     content: c.content,
     source_title: c.sourceTitle,
     embedding: embeddings[i] ? JSON.stringify(embeddings[i]) : null,
+    index_version: newVersion,
   }));
-  for (let i = 0; i < rows.length; i += 200) {
-    const { error: insErr } = await db.from("chunks").insert(rows.slice(i, i + 200));
-    if (insErr) throw insErr;
+  try {
+    for (let i = 0; i < rows.length; i += 200) {
+      const { error: insErr } = await db.from("chunks").insert(rows.slice(i, i + 200));
+      if (insErr) throw insErr;
+    }
+  } catch (e) {
+    // Roll back the half-written new version; the old one stays active.
+    await db.from("chunks").delete().eq("twin_id", twinId).eq("index_version", newVersion);
+    throw e;
   }
+  // New version complete → retire the old one.
+  await db.from("chunks").delete().eq("twin_id", twinId).lt("index_version", newVersion);
 
   // Persona depends on interview/correction signal; refresh it whenever
   // that signal exists. Failure here must never fail indexing.
@@ -142,11 +163,20 @@ export async function retrieve(
     if (!error && data?.length) return data as RetrievedChunk[];
   }
   // Degraded-mode fallback (no embedding key): naive keyword rank so the
-  // product still functions, visibly worse rather than dead.
+  // product still functions, visibly worse rather than dead. Scope to the
+  // latest index version so a mid-rebuild twin doesn't mix stale chunks.
+  const { data: verRow } = await db
+    .from("chunks")
+    .select("index_version")
+    .eq("twin_id", twinId)
+    .order("index_version", { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const { data } = await db
     .from("chunks")
     .select("content,source_title")
     .eq("twin_id", twinId)
+    .eq("index_version", verRow?.index_version ?? 1)
     .limit(400);
   const terms = query.toLowerCase().split(/\W+/).filter((t) => t.length > 3);
   return (data ?? [])

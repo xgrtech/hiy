@@ -1,7 +1,7 @@
 "use client";
 /** Onboarding step 1 of 3 per "Hiy Mockups.dc.html" §2a: claim your hiy.
  *  (Step 2 = feed content, in the app's Training page; step 3 = go live.) */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Onboard() {
@@ -12,6 +12,18 @@ export default function Onboard() {
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // If the visitor made a preview before signing up, we claim it instead of
+  // building a fresh twin — the preview and its content move over.
+  const [claimSlug, setClaimSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const pending = localStorage.getItem("hiy-claim");
+      if (pending) setClaimSlug(pending);
+    } catch {
+      /* private mode — no pending claim */
+    }
+  }, []);
 
   const slugOk = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/.test(username.toLowerCase().trim());
 
@@ -19,18 +31,32 @@ export default function Onboard() {
     setError("");
     setBusy(true);
     try {
-      const res = await fetch("/api/twin", {
+      const endpoint = claimSlug ? "/api/twin/claim" : "/api/twin";
+      const body = claimSlug
+        ? {
+            previewSlug: claimSlug,
+            username: username.toLowerCase().trim(),
+            name: name.trim(),
+            identityConfirmed: confirmed,
+          }
+        : {
+            username: username.toLowerCase().trim(),
+            name: name.trim(),
+            roleLine: roleLine.trim() || undefined,
+            identityConfirmed: confirmed,
+          };
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          username: username.toLowerCase().trim(),
-          name: name.trim(),
-          roleLine: roleLine.trim() || undefined,
-          identityConfirmed: confirmed,
-        }),
+        body: JSON.stringify(body),
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error ?? "Something went wrong.");
+      try {
+        localStorage.removeItem("hiy-claim");
+      } catch {
+        /* ignore */
+      }
       router.refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -56,9 +82,13 @@ export default function Onboard() {
           <span className="h-1 flex-1 rounded-full bg-surface2" />
         </div>
 
-        <h1 className="font-display mt-7 text-3xl">Claim your hiy</h1>
+        <h1 className="font-display mt-7 text-3xl">
+          {claimSlug ? "Keep your preview" : "Claim your hiy"}
+        </h1>
         <p className="mt-1.5 text-sm text-inksoft">
-          This is the link everyone will use to reach you.
+          {claimSlug
+            ? "Pick your link — the preview you just made, and everything it learned, moves over."
+            : "This is the link everyone will use to reach you."}
         </p>
 
         <div
@@ -81,12 +111,14 @@ export default function Onboard() {
           placeholder="Your full name (shown on the page)"
           className={`mt-3 ${inputCls}`}
         />
-        <input
-          value={roleLine}
-          onChange={(e) => setRoleLine(e.target.value)}
-          placeholder="One-line role, e.g. Startup coach · 40k followers"
-          className={`mt-3 ${inputCls}`}
-        />
+        {!claimSlug && (
+          <input
+            value={roleLine}
+            onChange={(e) => setRoleLine(e.target.value)}
+            placeholder="One-line role, e.g. Startup coach · 40k followers"
+            className={`mt-3 ${inputCls}`}
+          />
+        )}
         <label className="mt-4 flex items-start gap-2.5 text-xs text-inksoft">
           <input
             type="checkbox"
@@ -104,10 +136,10 @@ export default function Onboard() {
           disabled={busy || !confirmed || !username || !name}
           className="btn-warm mt-5 w-full px-6 py-3 text-sm disabled:opacity-40"
         >
-          {busy ? "Creating…" : "Continue"}
+          {busy ? (claimSlug ? "Claiming…" : "Creating…") : claimSlug ? "Keep my hiy" : "Continue"}
         </button>
         <p className="mt-3 text-center text-xs text-inkfaint">
-          Next: feed it your content, then go live.
+          {claimSlug ? "Your preview becomes permanent — add more anytime." : "Next: feed it your content, then go live."}
         </p>
       </div>
     </main>

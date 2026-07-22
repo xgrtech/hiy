@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import TwinChat from "@/components/TwinChat";
+import ClaimCTA from "@/components/ClaimCTA";
 
 export const dynamic = "force-dynamic";
 
@@ -71,10 +72,10 @@ export default async function TwinPage({
         {twin.is_ephemeral && !expired && (
           <p className="mx-auto mb-6 rounded-2xl bg-accentsoft px-4 py-2.5 text-sm text-accentdeep">
             24-hour preview.{" "}
-            <Link href="/app" className="font-semibold underline">
+            <ClaimCTA slug={twin.slug} className="font-semibold underline">
               Sign up free
-            </Link>{" "}
-            to keep it and claim hiy.ai/your-name.
+            </ClaimCTA>{" "}
+            to keep it — everything it learned moves to hiy.ai/your-name.
           </p>
         )}
 

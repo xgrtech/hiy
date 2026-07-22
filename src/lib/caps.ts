@@ -45,20 +45,18 @@ function monthKey(): string {
 
 export async function checkAndCountMessage(twinId: string, caps: Caps): Promise<boolean> {
   const db = supabaseAdmin();
-  const month = monthKey();
-  const { data } = await db
-    .from("usage_counters")
-    .select("messages_used")
-    .eq("twin_id", twinId)
-    .eq("month", month)
-    .maybeSingle();
-  const used = data?.messages_used ?? 0;
-  if (used >= caps.monthly_messages) return false;
-  await db.from("usage_counters").upsert(
-    { twin_id: twinId, month, messages_used: used + 1 },
-    { onConflict: "twin_id,month" }
-  );
-  return true;
+  // Atomic check-and-increment: concurrent chats can't race past the cap
+  // (the old read-then-write could double-count under load).
+  const { data, error } = await db.rpc("try_increment_message_usage", {
+    p_twin_id: twinId,
+    p_month: monthKey(),
+    p_limit: caps.monthly_messages,
+  });
+  if (error) {
+    console.error("message usage increment failed", error);
+    return false; // fail closed: don't serve unmetered on a counter error
+  }
+  return data === true;
 }
 
 /** Interview + correction sources count toward words but not source count. */

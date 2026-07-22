@@ -7,7 +7,7 @@ import { buildSystemPromptParts } from "@/lib/rag/prompt";
 import { safePersona } from "@/lib/rag/persona";
 import { streamChat, activeChatProvider } from "@/lib/llm/provider";
 import { capsForTwin, checkAndCountMessage } from "@/lib/caps";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitDistributed, clientIp } from "@/lib/ratelimit";
 
 export const maxDuration = 60;
 
@@ -27,7 +27,7 @@ const Body = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  if (!rateLimit(`chat:${clientIp(req)}`, 20, 60_000)) {
+  if (!(await rateLimitDistributed(`chat:${clientIp(req)}`, 20, 60_000))) {
     return Response.json({ error: "Slow down a little." }, { status: 429 });
   }
   const parsed = Body.safeParse(await req.json().catch(() => null));

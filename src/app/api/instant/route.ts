@@ -9,7 +9,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { ingest, IngestError } from "@/lib/ingest";
 import { reindexTwin } from "@/lib/rag/engine";
 import { EPHEMERAL_CAPS } from "@/lib/caps";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitDistributed, clientIp } from "@/lib/ratelimit";
 
 export const maxDuration = 120;
 
@@ -21,8 +21,9 @@ const Body = z.object({
 
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
-  // 3 instant twins per IP per hour — the wow is cheap but not free.
-  if (!rateLimit(`instant:${ip}`, 3, 60 * 60_000)) {
+  // 3 instant twins per IP per hour — the wow is cheap but not free. Shared
+  // across instances so it can't be bypassed by hitting different lambdas.
+  if (!(await rateLimitDistributed(`instant:${ip}`, 3, 60 * 60_000))) {
     return Response.json(
       { error: "You've made a few preview twins already — sign up to build a real one." },
       { status: 429 }
