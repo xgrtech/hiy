@@ -41,12 +41,25 @@ export function activeChatProvider(): ChatProvider {
   return "none";
 }
 
+/**
+ * Provider per task. CHAT_PROVIDER=anthropic|openai forces the chat path
+ * onto one provider (A/B tests, cost pinning, provider outages) — but only
+ * when that provider's key exists: a typo or missing key falls back to
+ * auto-detection rather than killing public chat.
+ */
+export function providerFor(task: LlmTask): ChatProvider {
+  const forced = task === "chat" ? process.env.CHAT_PROVIDER : undefined;
+  if (forced === "anthropic" && process.env.ANTHROPIC_API_KEY) return "anthropic";
+  if (forced === "openai" && process.env.OPENAI_API_KEY) return "openai";
+  return activeChatProvider();
+}
+
 export function embeddingsConfigured(): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
 function modelFor(task: LlmTask) {
-  const p = activeChatProvider();
+  const p = providerFor(task);
   if (p === "anthropic") return anthropic(MODELS.anthropic[task]);
   if (p === "openai") return openai(MODELS.openai[task]);
   throw new Error(
