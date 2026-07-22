@@ -5,6 +5,7 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Thinking from "./Thinking";
 
 export default function InstantTwin() {
   const router = useRouter();
@@ -39,7 +40,13 @@ export default function InstantTwin() {
   return (
     <div className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.1)]">
       <div className="dome flex flex-col items-center px-8 pb-4 pt-8">
-        <div className={`orb h-16 w-16 ${busy ? "orb--thinking" : ""}`} />
+        {busy ? (
+          <span className="flex h-16 w-16 items-center justify-center">
+            <Thinking state="working" size={64} label="building your hiy" />
+          </span>
+        ) : (
+          <div className="orb h-16 w-16" />
+        )}
         <p className="font-display mt-3 text-2xl">
           {name.trim() ? `${name.trim()}'s hiy` : "Your hiy"}
         </p>

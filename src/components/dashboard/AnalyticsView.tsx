@@ -24,11 +24,14 @@ export default function AnalyticsView({ stats }: { stats: AppStats }) {
           </p>
         ) : (
           <div className="mt-5 flex h-40 items-end gap-1.5">
-            {stats.days.map((d) => (
+            {stats.days.map((d, i) => (
               <div key={d.day} className="group relative flex-1">
                 <div
-                  className="w-full rounded-t-md bg-gradient-to-t from-accent to-[#d97748] transition group-hover:brightness-110"
-                  style={{ height: `${Math.max(3, (d.count / max) * 152)}px` }}
+                  className="bar-grow w-full rounded-t-md bg-gradient-to-t from-accent to-[#d97748] transition group-hover:brightness-110"
+                  style={{
+                    height: `${Math.max(3, (d.count / max) * 152)}px`,
+                    animationDelay: `${i * 40}ms`,
+                  }}
                   title={`${d.label}: ${d.count}`}
                 />
               </div>

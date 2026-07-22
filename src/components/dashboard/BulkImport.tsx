@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Thinking from "../Thinking";
 
 interface Item {
   key: string;
@@ -145,9 +146,18 @@ export default function BulkImport({ twinId }: { twinId: string }) {
             <button
               onClick={discover}
               disabled={!url.trim() || phase === "discovering"}
-              className="shrink-0 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="flex shrink-0 items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
             >
-              {phase === "discovering" ? "Looking…" : "Find content"}
+              {phase === "discovering" ? (
+                <>
+                  <span className="brightness-[6]">
+                    <Thinking state="searching" size={20} label="searching" />
+                  </span>
+                  Looking…
+                </>
+              ) : (
+                "Find content"
+              )}
             </button>
           </div>
           {error && <p className="mt-2 text-sm text-accent2">{error}</p>}

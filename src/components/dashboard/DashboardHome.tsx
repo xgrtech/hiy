@@ -64,8 +64,11 @@ export default function DashboardHome({
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {tiles.map((t) => (
-          <div key={t.label} className="rounded-2xl border border-line bg-surface p-4">
+        {tiles.map((t, i) => (
+          <div
+            key={t.label}
+            className={`anim-fade-up rounded-2xl border border-line bg-surface p-4 ${["d1", "d2", "d3", "d4"][i]}`}
+          >
             <p className="text-xs text-inksoft">{t.label}</p>
             <p className={`font-display mt-1.5 text-3xl ${t.accent ? "text-accent" : ""}`}>{t.value}</p>
             <p className="mt-1 text-[11px] text-inkfaint">{t.sub}</p>

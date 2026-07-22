@@ -5,6 +5,7 @@
  * honest "I don't know" replies get the dashed treatment.
  */
 import { useEffect, useRef, useState } from "react";
+import Thinking from "./Thinking";
 
 interface Msg {
   role: "user" | "assistant";
@@ -143,10 +144,9 @@ export default function TwinChat({
                   >
                     {m.content ||
                       (busy && i === messages.length - 1 ? (
-                        <span className="flex gap-1.5 py-1">
-                          <span className="think-dot h-2 w-2 rounded-full bg-inkfaint" />
-                          <span className="think-dot h-2 w-2 rounded-full bg-inkfaint" />
-                          <span className="think-dot h-2 w-2 rounded-full bg-inkfaint" />
+                        <span className="flex items-center gap-2 py-0.5 text-xs text-inkfaint">
+                          <Thinking state="composing" size={20} label="thinking" />
+                          thinking…
                         </span>
                       ) : (
                         ""

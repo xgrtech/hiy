@@ -1,5 +1,6 @@
 import Link from "next/link";
 import InstantTwin from "@/components/InstantTwin";
+import Reveal from "@/components/Reveal";
 
 /* Landing per "Hiy Mockups.dc.html" §1a — warm & human, one terracotta
    accent, Instrument Serif display. Copy adapted to shipped features only
@@ -98,36 +99,36 @@ export default function Landing() {
       <header className="relative mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-20">
         <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-accentsoft blur-3xl" aria-hidden />
         <div className="pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-[#e7e0f0] blur-3xl" aria-hidden />
-        <p className="relative text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
+        <p className="anim-fade-up d1 relative text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
           Your AI self
         </p>
-        <h1 className="font-display relative mt-5 text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
+        <h1 className="anim-fade-up d2 font-display relative mt-5 text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
           Be there for everyone,
           <br />
           <em className="text-accent">even when you can&apos;t be.</em>
         </h1>
-        <p className="relative mx-auto mt-6 max-w-xl text-lg leading-relaxed text-inksoft">
+        <p className="anim-fade-up d3 relative mx-auto mt-6 max-w-xl text-lg leading-relaxed text-inksoft">
           hiy learns from everything you&apos;ve written, recorded, and said —
           then answers your people in your words, any hour, anywhere. Honestly.
         </p>
-        <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/app" className="btn-warm px-7 py-3.5 text-sm">
+        <div className="anim-fade-up d4 relative mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/app" className="btn-warm press px-7 py-3.5 text-sm">
             Create your hiy — free
           </Link>
           <a
             href="#try"
-            className="rounded-full border border-line bg-surface px-7 py-3.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
+            className="press rounded-full border border-line bg-surface px-7 py-3.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
           >
             Try a 30-second preview
           </a>
         </div>
-        <p className="relative mt-4 text-xs text-inkfaint">
+        <p className="anim-fade-up d5 relative mt-4 text-xs text-inkfaint">
           Live in under 5 minutes · No credit card
         </p>
       </header>
 
       {/* try strip — the real conversion object, flanked by honest examples */}
-      <section id="try" className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
+      <section id="try" className="anim-fade-up d6 mx-auto max-w-6xl px-6 pb-24 sm:px-10">
         <p className="mb-6 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-inkfaint">
           Make one right now — no account
         </p>
@@ -184,21 +185,25 @@ export default function Landing() {
       {/* dark: three steps */}
       <section id="how" className="bg-dark px-6 py-20 text-white sm:px-10">
         <div className="mx-auto max-w-6xl">
-          <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)] [text-wrap:balance]">
-            Three steps to your hiy
-          </h2>
-          <p className="mt-2 text-center text-sm text-white/60">
-            Feed it your content. It learns your voice. Share it with the world.
-          </p>
+          <Reveal>
+            <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)] [text-wrap:balance]">
+              Three steps to your hiy
+            </h2>
+            <p className="mt-2 text-center text-sm text-white/60">
+              Feed it your content. It learns your voice. Share it with the world.
+            </p>
+          </Reveal>
           <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.n} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
-                <p className="font-display text-lg text-accent">{s.n}</p>
-                <div className="mt-4 flex min-h-14 items-center rounded-xl border border-white/8 bg-white/[0.03] p-3.5">
-                  {s.art}
+            {STEPS.map((s, i) => (
+              <Reveal key={s.n} delay={i * 110}>
+                <div className="h-full rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                  <p className="font-display text-lg text-accent">{s.n}</p>
+                  <div className="mt-4 flex min-h-14 items-center rounded-xl border border-white/8 bg-white/[0.03] p-3.5">
+                    {s.art}
+                  </div>
+                  <p className="mt-4 text-sm leading-relaxed text-white/70">{s.d}</p>
                 </div>
-                <p className="mt-4 text-sm leading-relaxed text-white/70">{s.d}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -206,29 +211,35 @@ export default function Landing() {
 
       {/* more than a chatbot */}
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-        <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)]">
-          More than a chatbot
-        </h2>
+        <Reveal>
+          <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)]">
+            More than a chatbot
+          </h2>
+        </Reveal>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.t} className="rounded-2xl border border-line bg-surface p-5">
-              <h3 className="text-[15px] font-semibold">{f.t}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-inksoft">{f.d}</p>
-            </div>
+          {FEATURES.map((f, i) => (
+            <Reveal key={f.t} delay={(i % 3) * 90}>
+              <div className="lift h-full rounded-2xl border border-line bg-surface p-5">
+                <h3 className="text-[15px] font-semibold">{f.t}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-inksoft">{f.d}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* closing */}
       <section className="px-6 pb-20 pt-6 text-center">
-        <h2 className="font-display text-[clamp(2.2rem,5vw,3.6rem)] leading-tight [text-wrap:balance]">
-          Your people are asking.
-          <br />
-          <em className="text-accent">Say hiy.</em>
-        </h2>
-        <Link href="/app" className="btn-warm mt-8 inline-block px-8 py-3.5 text-sm">
-          Create your free hiy
-        </Link>
+        <Reveal>
+          <h2 className="font-display text-[clamp(2.2rem,5vw,3.6rem)] leading-tight [text-wrap:balance]">
+            Your people are asking.
+            <br />
+            <em className="text-accent">Say hiy.</em>
+          </h2>
+          <Link href="/app" className="btn-warm press mt-8 inline-block px-8 py-3.5 text-sm">
+            Create your free hiy
+          </Link>
+        </Reveal>
       </section>
 
       <footer className="border-t border-line px-6 py-8 sm:px-10">
