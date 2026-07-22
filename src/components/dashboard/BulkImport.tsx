@@ -146,7 +146,7 @@ export default function BulkImport({ twinId }: { twinId: string }) {
             <button
               onClick={discover}
               disabled={!url.trim() || phase === "discovering"}
-              className="flex shrink-0 items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="btn-warm shrink-0 px-5 py-2 text-sm disabled:opacity-50"
             >
               {phase === "discovering" ? (
                 <>
@@ -224,7 +224,7 @@ export default function BulkImport({ twinId }: { twinId: string }) {
             <button
               onClick={runImport}
               disabled={selected.size === 0}
-              className="mt-3 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="btn-warm mt-3 px-6 py-2.5 text-sm disabled:opacity-50"
             >
               Import {selected.size} item{selected.size === 1 ? "" : "s"}
             </button>

@@ -4,6 +4,7 @@ import InstantTwin from "@/components/InstantTwin";
 import ParticleWordmark from "@/components/fx/ParticleWordmark";
 import ExampleTwinCard from "@/components/fx/ExampleTwinCard";
 import OnView from "@/components/fx/OnView";
+import ThemeToggle from "@/components/ThemeToggle";
 
 /* Landing per "Hiy Mockups.dc.html" §1a — warm & human, one terracotta
    accent, Instrument Serif display. Copy adapted to shipped features only
@@ -107,12 +108,13 @@ export default function Landing() {
           <Link href="/pricing" className="rounded-full px-4 py-1.5 transition hover:text-ink">Pricing</Link>
         </div>
         <div className="flex items-center gap-2.5">
+          <ThemeToggle />
           <Link href="/app" className="px-2 text-[13px] font-medium text-inksoft transition hover:text-ink">
             Log in
           </Link>
           <Link
             href="/app"
-            className="rounded-full bg-dark px-4.5 py-2 text-[13px] font-semibold text-white transition hover:bg-accent"
+            className="rounded-full bg-dark px-4.5 py-2 text-[13px] font-semibold text-white transition hover:opacity-90"
           >
             Create your hiy
           </Link>
@@ -121,14 +123,9 @@ export default function Landing() {
 
       {/* hero */}
       <header className="relative mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-20">
-        <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-accentsoft blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-[#e7e0f0] blur-3xl" aria-hidden />
-        {/* the signature: scattered motes assemble into "hiy." — your content
-            becoming you; scatter it with the cursor and it reforms */}
-        <div className="relative mx-auto h-36 max-w-2xl sm:h-44">
-          <ParticleWordmark className="pointer-events-none absolute inset-0 h-full w-full" />
-        </div>
-        <h1 className="font-display relative mt-4 text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
+        <div className="hero-glow pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-accentsoft blur-3xl" aria-hidden />
+        <div className="hero-glow pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-[#e7e0f0] blur-3xl" aria-hidden />
+        <h1 className="font-display relative text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
           Be there for everyone,
           <br />
           <em className="text-accent">even when you can&apos;t be.</em>
@@ -147,6 +144,11 @@ export default function Landing() {
           >
             Try a 30-second preview
           </a>
+          {/* the signature: scattered motes assemble into "hiy." — sits beside
+              the CTA, scatter it with the cursor and it reforms */}
+          <div className="relative ml-1 hidden h-16 w-36 sm:block" aria-hidden>
+            <ParticleWordmark className="pointer-events-none absolute inset-0 h-full w-full" />
+          </div>
         </div>
         <p className="relative mt-4 text-xs text-inkfaint">
           Live in under 5 minutes · No credit card

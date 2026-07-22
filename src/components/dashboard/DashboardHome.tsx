@@ -87,7 +87,7 @@ export default function DashboardHome({
           </div>
         </div>
       ) : (
-        <div className="dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
+        <div className="beam dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
           <span className="orb h-14 w-14" aria-hidden />
           <div>
             <h2 className="font-display text-2xl">Bring your hiy to life</h2>

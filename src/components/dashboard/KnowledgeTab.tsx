@@ -228,7 +228,7 @@ export default function KnowledgeTab({
         <button
           onClick={addSource}
           disabled={busy || (tab === "file" ? !file : !payload)}
-          className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+          className="mt-4 btn-warm px-6 py-2.5 text-sm disabled:opacity-50"
         >
           {busy ? "Ingesting & re-indexing…" : "Add source"}
         </button>

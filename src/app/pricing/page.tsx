@@ -73,7 +73,7 @@ export default function PricingPage() {
           </Link>
           <Link
             href="/app"
-            className="rounded-full bg-dark px-4.5 py-2 text-[13px] font-semibold text-white transition hover:bg-accent"
+            className="rounded-full bg-dark px-4.5 py-2 text-[13px] font-semibold text-white transition hover:opacity-90"
           >
             Create your hiy
           </Link>

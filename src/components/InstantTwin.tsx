@@ -38,7 +38,7 @@ export default function InstantTwin() {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.1)]">
+    <div className="beam relative mx-auto w-full max-w-[420px] overflow-hidden rounded-3xl border border-line bg-surface shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.1)]">
       <div className="dome flex flex-col items-center px-8 pb-4 pt-8">
         <span className="flex h-16 w-16 items-center justify-center">
           <Thinking

@@ -1,10 +1,11 @@
 "use client";
 /**
- * Creator app shell — claude.ai/chatgpt-style: light neutral rail, lucide
- * icons, a subtle selected state, and an account menu that opens Settings
- * and Plan as popovers instead of full pages.
+ * Creator app shell — claude.ai/chatgpt-style: light/dark neutral rail,
+ * lucide icons, a subtle selected state. Product features (Behavior,
+ * Share & embed) are sidebar views; account-level things (Profile, Plan,
+ * appearance) live in the account menu.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -12,13 +13,18 @@ import {
   PenLine,
   Sparkles,
   BarChart3,
+  SlidersHorizontal,
+  Share2,
   Settings as SettingsIcon,
   CreditCard,
   ExternalLink,
   LogOut,
   ChevronsUpDown,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { currentTheme, toggleTheme, type Theme } from "@/lib/theme";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,6 +36,8 @@ import {
 import DashboardHome from "./dashboard/DashboardHome";
 import TrainingView from "./dashboard/TrainingView";
 import AnalyticsView from "./dashboard/AnalyticsView";
+import BehaviorTab from "./dashboard/BehaviorTab";
+import ShareTab from "./dashboard/ShareTab";
 import SettingsDialog from "./dashboard/SettingsDialog";
 import PlanDialog from "./dashboard/PlanDialog";
 import InterviewFlow from "./InterviewFlow";
@@ -40,9 +48,24 @@ const NAV = [
   { key: "training", label: "Training", Icon: PenLine },
   { key: "refine", label: "Refine", Icon: Sparkles },
   { key: "analytics", label: "Analytics", Icon: BarChart3 },
+  { key: "behavior", label: "Behavior", Icon: SlidersHorizontal },
+  { key: "share", label: "Share & embed", Icon: Share2 },
 ] as const;
 
 export type ViewKey = (typeof NAV)[number]["key"];
+
+const VIEW_TITLE: Record<Exclude<ViewKey, "home">, string> = {
+  training: "Training",
+  refine: "Refine",
+  analytics: "Analytics",
+  behavior: "Behavior",
+  share: "Share & embed",
+};
+
+const VIEW_SUB: Partial<Record<ViewKey, string>> = {
+  behavior: "How your hiy greets, what it suggests, and where it draws the line.",
+  share: "Your public link, deep links, and the embeddable widget.",
+};
 
 export default function Dashboard({
   twin,
@@ -59,6 +82,8 @@ export default function Dashboard({
   const [view, setView] = useState<ViewKey>("home");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
+  const [theme, setThemeState] = useState<Theme>("light");
+  useEffect(() => setThemeState(currentTheme()), []);
   const hasInterview = sources.some((s) => s.type === "interview");
   const firstName = twin.name.split(" ")[0];
 
@@ -78,7 +103,7 @@ export default function Dashboard({
   );
 
   return (
-    <main className="flex min-h-screen bg-paper">
+    <main className="wash-dawn flex min-h-screen bg-paper">
       {/* rail */}
       <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col border-r border-line bg-surface lg:w-60">
         <div className="flex items-center gap-2 px-4 pb-5 pt-5 lg:px-5">
@@ -153,7 +178,7 @@ export default function Dashboard({
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
                 <SettingsIcon className="h-4 w-4 text-inksoft" />
-                Settings
+                Profile &amp; settings
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setPlanOpen(true)}>
                 <CreditCard className="h-4 w-4 text-inksoft" />
@@ -166,6 +191,20 @@ export default function Dashboard({
                 </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {/* appearance — flips inline, keeps the menu open */}
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setThemeState(toggleTheme());
+                }}
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4 text-inksoft" />
+                ) : (
+                  <Moon className="h-4 w-4 text-inksoft" />
+                )}
+                {theme === "dark" ? "Light mode" : "Dark mode"}
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={signOut} className="text-accent focus:bg-accentsoft">
                 <LogOut className="h-4 w-4" />
                 Log out
@@ -178,6 +217,13 @@ export default function Dashboard({
       {/* content */}
       <section className="min-w-0 flex-1 px-5 py-8 sm:px-8">
         <div className="mx-auto max-w-4xl">
+          {view !== "home" && view !== "refine" && (
+            <header className="mb-6">
+              <h1 className="font-display text-3xl">{VIEW_TITLE[view]}</h1>
+              {VIEW_SUB[view] && <p className="mt-1 text-sm text-inksoft">{VIEW_SUB[view]}</p>}
+            </header>
+          )}
+
           {view === "home" && (
             <DashboardHome
               twin={twin}
@@ -200,6 +246,8 @@ export default function Dashboard({
             <InterviewFlow twinId={twin.id} twinName={twin.name} onDone={() => router.refresh()} />
           )}
           {view === "analytics" && <AnalyticsView stats={stats} />}
+          {view === "behavior" && <BehaviorTab twin={twin} />}
+          {view === "share" && <ShareTab twin={twin} />}
         </div>
       </section>
 

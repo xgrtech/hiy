@@ -56,7 +56,7 @@ export default function ReportPage({
           <button
             onClick={submit}
             disabled={state === "busy" || reason.trim().length < 10}
-            className="mt-4 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper hover:bg-accent disabled:opacity-40"
+            className="mt-4 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper hover:opacity-90 disabled:opacity-40"
           >
             Submit report
           </button>

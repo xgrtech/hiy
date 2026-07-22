@@ -151,7 +151,7 @@ export default function InterviewFlow({
             <button
               onClick={() => record(answer)}
               disabled={!answer.trim()}
-              className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="btn-warm px-5 py-2 text-sm disabled:opacity-50"
             >
               Next
             </button>
@@ -179,7 +179,7 @@ export default function InterviewFlow({
           <button
             onClick={submit}
             disabled={busy || answered < 3}
-            className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+            className="btn-warm mt-4 px-6 py-2.5 text-sm disabled:opacity-50"
           >
             {busy ? "Teaching your twin…" : "Finish interview"}
           </button>

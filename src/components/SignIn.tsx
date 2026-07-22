@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SignIn() {
   const router = useRouter();
@@ -149,7 +150,10 @@ export default function SignIn() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
+    <main className="relative flex min-h-screen items-center justify-center px-6">
+      <div className="absolute right-5 top-5">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.08)]">
         <div className="orb mx-auto mb-5 h-16 w-16" />
         <h1 className="font-display text-3xl">
@@ -200,7 +204,7 @@ export default function SignIn() {
 
         <button
           onClick={google}
-          className="w-full rounded-full bg-dark px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent"
+          className="w-full rounded-full bg-dark px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90"
         >
           Continue with Google
         </button>
