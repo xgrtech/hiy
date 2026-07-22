@@ -90,14 +90,11 @@ export async function POST(req: NextRequest) {
       await db.from("twins").update({ guardrail_topics: merged }).eq("id", twinId);
     }
 
-    await db.from("twins").update({ status: "indexing" }).eq("id", twinId);
     const numChunks = await reindexTwin(twinId); // also refreshes persona
-    await db.from("twins").update({ status: "live" }).eq("id", twinId);
 
     return Response.json({ sourceId: source.id, numChunks });
   } catch (e) {
     console.error("interview error", e);
-    await db.from("twins").update({ status: "live" }).eq("id", twinId);
     return Response.json(
       { error: "Something went wrong saving your interview. Your answers are kept locally — try again." },
       { status: 500 }

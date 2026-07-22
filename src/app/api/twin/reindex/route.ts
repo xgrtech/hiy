@@ -34,13 +34,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await db.from("twins").update({ status: "indexing" }).eq("id", twin.id);
+    // Preserve publish state across a re-index (crash-safe swap keeps the old
+    // index live meanwhile). No auto-publish.
     const numChunks = await reindexTwin(twin.id);
-    await db.from("twins").update({ status: "live" }).eq("id", twin.id);
     return Response.json({ numChunks });
   } catch (e) {
     console.error("reindex error", e);
-    await db.from("twins").update({ status: "live" }).eq("id", twin.id);
     return Response.json({ error: "Re-indexing failed. Try again." }, { status: 500 });
   }
 }

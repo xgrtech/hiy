@@ -48,17 +48,15 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    await db.from("twins").update({ status: "indexing" }).eq("id", twinId);
     const numChunks = await reindexTwin(twinId);
-    // A twin with no sources left goes back to draft.
-    await db
-      .from("twins")
-      .update({ status: numChunks > 0 ? "live" : "draft" })
-      .eq("id", twinId);
+    // Nothing left to answer from → auto-unpublish. (We don't auto-publish on
+    // add, but a live twin with an empty index must not stay public.)
+    if (numChunks === 0) {
+      await db.from("twins").update({ status: "draft" }).eq("id", twinId);
+    }
     return Response.json({ numChunks });
   } catch (e) {
     console.error("post-delete reindex error", e);
-    await db.from("twins").update({ status: "live" }).eq("id", twinId);
     return Response.json({ error: "Deleted, but re-indexing failed. Hit re-index in Knowledge." }, { status: 500 });
   }
 }

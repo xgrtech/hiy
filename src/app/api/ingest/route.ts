@@ -121,9 +121,9 @@ export async function POST(req: NextRequest) {
       return Response.json({ source, numChunks: 0 });
     }
 
-    await db.from("twins").update({ status: "indexing" }).eq("id", twinId);
+    // Content add no longer auto-publishes — the twin stays in whatever
+    // publish state it's in until the creator explicitly publishes.
     const numChunks = await reindexTwin(twinId);
-    await db.from("twins").update({ status: "live" }).eq("id", twinId);
 
     return Response.json({ source, numChunks });
   } catch (e) {

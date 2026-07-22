@@ -1,7 +1,7 @@
 /** Public hiy profile per "Hiy Mockups" §4a/5b: hiy.ai/{username}. */
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { supabaseAdmin } from "@/lib/supabase/server";
+import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import TwinChat from "@/components/TwinChat";
 import ClaimCTA from "@/components/ClaimCTA";
 
@@ -25,12 +25,18 @@ export default async function TwinPage({
   const { data: twin } = await db
     .from("twins")
     .select(
-      "id,slug,name,role_line,bio,greeting,avatar_url,links,appearance,suggested_questions,status,is_ephemeral,expires_at"
+      "id,slug,name,role_line,bio,greeting,avatar_url,links,appearance,suggested_questions,status,is_ephemeral,expires_at,owner_id"
     )
     .eq("slug", slug)
     .single();
 
-  if (!twin || (twin.status !== "live" && !twin.is_ephemeral)) notFound();
+  if (!twin) notFound();
+  // Draft twins are private — visible only to their owner (private preview).
+  if (twin.status !== "live" && !twin.is_ephemeral) {
+    const sb = await supabaseServer();
+    const { data: auth } = await sb.auth.getUser();
+    if (!auth.user || auth.user.id !== twin.owner_id) notFound();
+  }
   const expired =
     twin.is_ephemeral && twin.expires_at && new Date(twin.expires_at) < new Date();
 

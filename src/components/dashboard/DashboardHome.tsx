@@ -4,6 +4,7 @@
  *  All real data. */
 import { useState } from "react";
 import { Copy, Check, ArrowRight, MessageSquare } from "lucide-react";
+import PublishButton from "./PublishButton";
 import type { TwinRecord, SourceRecord, AppStats } from "./types";
 import type { ViewKey } from "../Dashboard";
 
@@ -33,6 +34,7 @@ export default function DashboardHome({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const isLive = twin.status === "live";
+  const hasContent = sources.length > 0;
 
   function copyLink() {
     navigator.clipboard?.writeText(`${origin}/${twin.slug}`);
@@ -62,7 +64,7 @@ export default function DashboardHome({
         </p>
       </header>
 
-      {/* live → share bar · draft → bring-to-life hero */}
+      {/* live → share bar · draft+content → ready to publish · draft empty → bring-to-life */}
       {isLive ? (
         <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface p-3 pl-5">
           <span className="flex items-center gap-2 text-sm">
@@ -70,7 +72,7 @@ export default function DashboardHome({
             <span className="text-inksoft">Live at</span>
             <b className="font-medium">hiy.ai/{twin.slug}</b>
           </span>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex flex-wrap items-center gap-2">
             <button
               onClick={copyLink}
               className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-inksoft transition hover:border-ink hover:text-ink"
@@ -84,6 +86,36 @@ export default function DashboardHome({
             >
               Embed →
             </button>
+            <PublishButton
+              publish={false}
+              className="rounded-full px-3 py-1.5 text-xs font-medium text-inkfaint transition hover:text-accent"
+            >
+              Unpublish
+            </PublishButton>
+          </div>
+        </div>
+      ) : hasContent ? (
+        <div className="beam dome mb-5 flex flex-col items-center gap-3 rounded-2xl border border-line p-8 text-center">
+          <span className="orb h-14 w-14" aria-hidden />
+          <div>
+            <h2 className="font-display text-2xl">Ready when you are</h2>
+            <p className="mx-auto mt-1 max-w-md text-sm text-inksoft">
+              Your hiy has learned from {sources.length} source{sources.length === 1 ? "" : "s"}.
+              Review it privately, then publish to make hiy.ai/{twin.slug} public.
+            </p>
+          </div>
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+            <a
+              href={`/${twin.slug}?preview=1`}
+              target="_blank"
+              rel="noreferrer"
+              className="press rounded-full border border-line bg-surface px-5 py-2.5 text-sm font-medium text-inksoft transition hover:border-ink hover:text-ink"
+            >
+              Preview privately
+            </a>
+            <PublishButton publish className="btn-warm press px-6 py-2.5 text-sm">
+              Publish
+            </PublishButton>
           </div>
         </div>
       ) : (
@@ -92,8 +124,8 @@ export default function DashboardHome({
           <div>
             <h2 className="font-display text-2xl">Bring your hiy to life</h2>
             <p className="mx-auto mt-1 max-w-md text-sm text-inksoft">
-              Add a blog post, a video, or a few paragraphs in your voice. As
-              soon as it has something to say, hiy.ai/{twin.slug} goes public.
+              Add a blog post, a video, or a few paragraphs in your voice —
+              then review and publish it when it sounds like you.
             </p>
           </div>
           <button
