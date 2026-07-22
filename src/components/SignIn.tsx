@@ -14,6 +14,9 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  /** Non-null once a confirmation email went out: swaps the whole card
+   *  into the "check your inbox" state instead of a small text line. */
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function google() {
     const sb = supabaseBrowser();
@@ -50,7 +53,7 @@ export default function SignIn() {
           // Email confirmation disabled — signed in immediately.
           router.refresh();
         } else {
-          setNotice("Check your inbox — we sent a confirmation link to finish signing up.");
+          setSentTo(email.trim());
         }
       } else {
         const { error: err } = await sb.auth.signInWithPassword({
@@ -65,15 +68,85 @@ export default function SignIn() {
       setError(
         /invalid login credentials/i.test(msg)
           ? "Wrong email or password — or sign up first."
-          : msg
+          : /email not confirmed/i.test(msg)
+            ? "That email isn't confirmed yet — check your inbox for the link."
+            : msg
       );
     } finally {
       setBusy(false);
     }
   }
 
+  async function resend() {
+    if (!sentTo) return;
+    setError("");
+    setNotice("");
+    setBusy(true);
+    const sb = supabaseBrowser();
+    const { error: err } = await sb.auth.resend({
+      type: "signup",
+      email: sentTo,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/app` },
+    });
+    setBusy(false);
+    if (err) {
+      setError(
+        /rate|too many|security purposes/i.test(err.message)
+          ? "Emails can only be resent every so often — give it a couple of minutes."
+          : err.message
+      );
+    } else {
+      setNotice("Sent again — give it a minute, and check spam too.");
+    }
+  }
+
   const inputCls =
     "w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent";
+
+  if (sentTo) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.08)]">
+          <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-greensoft text-3xl">
+            ✉️
+          </span>
+          <h1 className="font-display text-3xl">Check your inbox</h1>
+          <p className="mt-3 text-sm leading-relaxed text-inksoft">
+            We sent a confirmation link to
+            <br />
+            <b className="text-ink">{sentTo}</b>
+          </p>
+          <p className="mt-2 text-xs text-inkfaint">
+            Click it and you&apos;ll land straight in your dashboard.
+          </p>
+
+          {notice && <p className="mt-4 text-xs text-green">{notice}</p>}
+          {error && <p className="mt-4 text-xs text-accent">{error}</p>}
+
+          <button
+            onClick={resend}
+            disabled={busy}
+            className="btn-warm mt-6 w-full px-6 py-3 text-sm disabled:opacity-50"
+          >
+            {busy ? "Sending…" : "Resend email"}
+          </button>
+          <button
+            onClick={() => {
+              setSentTo(null);
+              setError("");
+              setNotice("");
+            }}
+            className="mt-3 text-xs font-semibold text-inksoft underline hover:text-ink"
+          >
+            Use a different email
+          </button>
+          <p className="mt-5 text-[11px] text-inkfaint">
+            Nothing after a few minutes? Check your spam folder.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6">
