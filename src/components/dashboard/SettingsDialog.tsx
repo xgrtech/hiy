@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ProfileTab from "./ProfileTab";
+import DataControls from "./DataControls";
 import type { TwinRecord } from "./types";
 
 export default function SettingsDialog({
@@ -27,6 +28,7 @@ export default function SettingsDialog({
         </DialogHeader>
         <div className="max-h-[68vh] overflow-y-auto p-6">
           <ProfileTab twin={twin} />
+          <DataControls />
         </div>
       </DialogContent>
     </Dialog>

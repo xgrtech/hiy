@@ -29,6 +29,7 @@ export default function BulkImport({ twinId }: { twinId: string }) {
   const [budget, setBudget] = useState<{ remainingSources: number } | null>(null);
   const [phase, setPhase] = useState<"idle" | "discovering" | "picking" | "importing" | "done">("idle");
   const [error, setError] = useState("");
+  const [reindexError, setReindexError] = useState("");
 
   async function discover() {
     setError("");
@@ -99,13 +100,25 @@ export default function BulkImport({ twinId }: { twinId: string }) {
     for (const item of queue) {
       await importOne(item);
     }
+    // The per-item imports used skipReindex, so this final reindex is what
+    // actually builds the searchable index. Surface its failure instead of
+    // silently reporting success.
     try {
-      await fetch("/api/twin/reindex", {
+      const res = await fetch("/api/twin/reindex", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ twinId }),
       });
-    } catch {}
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error ?? "Indexing failed.");
+      }
+      setReindexError("");
+    } catch (e) {
+      setReindexError(
+        `Imported, but building the index failed: ${(e as Error).message} — open Knowledge and hit re-index.`
+      );
+    }
     setPhase("done");
     router.refresh();
   }
@@ -235,14 +248,17 @@ export default function BulkImport({ twinId }: { twinId: string }) {
             </p>
           )}
           {phase === "done" && (
-            <p className="mt-3 text-sm text-accent">
-              Imported {doneCount}/{selected.size} — your twin has been re-indexed.{" "}
+            <p className={`mt-3 text-sm ${reindexError ? "text-accent2" : "text-accent"}`}>
+              {reindexError
+                ? reindexError
+                : `Imported ${doneCount}/${selected.size} — your twin has been re-indexed.`}{" "}
               <button
                 onClick={() => {
                   setPhase("idle");
                   setItems([]);
                   setRows({});
                   setUrl("");
+                  setReindexError("");
                 }}
                 className="underline"
               >

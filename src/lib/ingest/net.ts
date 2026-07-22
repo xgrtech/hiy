@@ -16,8 +16,12 @@
  *  - bounded retries with jitter for transient failures only
  */
 import { lookup } from "node:dns/promises";
+import type { LookupAddress, LookupOptions } from "node:dns";
 import { isIP } from "node:net";
+import { Agent, fetch as undiciFetch } from "undici";
 import { INGEST_ERRORS } from "./errors";
+
+type PinnedAddr = { address: string; family: number };
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB is generous for any article page
 const TIMEOUT_MS = 15_000;
@@ -54,7 +58,15 @@ function isPrivateIp(ip: string): boolean {
   );
 }
 
-async function assertPublicHost(url: URL): Promise<void> {
+/**
+ * Validate the host and return the exact public IP(s) to connect to.
+ * Returning the addresses (rather than just asserting) lets us PIN the TCP
+ * connection to them, closing the DNS-rebinding window: without pinning, the
+ * OS resolver used by fetch() could return a different (private) IP than the
+ * one we validated. Null = the host is already an IP literal (fetch connects
+ * to it directly, nothing to pin).
+ */
+async function resolvePublicHost(url: URL): Promise<PinnedAddr[] | null> {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw INGEST_ERRORS.blockedUrl();
   }
@@ -63,7 +75,7 @@ async function assertPublicHost(url: URL): Promise<void> {
   const host = url.hostname.replace(/^\[|\]$/g, "");
   if (isIP(host)) {
     if (isPrivateIp(host)) throw INGEST_ERRORS.blockedUrl();
-    return;
+    return null;
   }
   if (host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) {
     throw INGEST_ERRORS.blockedUrl();
@@ -77,6 +89,29 @@ async function assertPublicHost(url: URL): Promise<void> {
   if (addrs.length === 0 || addrs.some((a) => isPrivateIp(a.address))) {
     throw INGEST_ERRORS.blockedUrl();
   }
+  return addrs.map((a) => ({ address: a.address, family: a.family }));
+}
+
+/** An undici agent whose DNS lookup is pinned to the pre-validated IPs, so
+ *  the connection can only go to an address we already cleared. */
+function pinnedAgent(addresses: PinnedAddr[]): Agent {
+  // Signature mirrors node:net's LookupFunction.
+  const lookupFn = (
+    _hostname: string,
+    options: LookupOptions,
+    callback: (
+      err: NodeJS.ErrnoException | null,
+      address: string | LookupAddress[],
+      family?: number
+    ) => void
+  ) => {
+    if (options?.all) {
+      callback(null, addresses as LookupAddress[]);
+    } else {
+      callback(null, addresses[0]!.address, addresses[0]!.family);
+    }
+  };
+  return new Agent({ connect: { lookup: lookupFn } });
 }
 
 async function readBodyCapped(res: Response): Promise<Buffer> {
@@ -112,24 +147,27 @@ async function fetchOnce(rawUrl: string): Promise<SafeFetchResult> {
   }
 
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    await assertPublicHost(url);
+    const pinned = await resolvePublicHost(url);
+    const agent = pinned ? pinnedAgent(pinned) : null;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     let res: Response;
     try {
-      res = await fetch(url.toString(), {
+      res = (await undiciFetch(url.toString(), {
         redirect: "manual",
         signal: controller.signal,
+        dispatcher: agent ?? undefined,
         headers: {
           "user-agent": USER_AGENT,
           accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.5",
           "accept-language": "en;q=0.9,*;q=0.5",
         },
-      });
+      })) as unknown as Response;
     } catch (e) {
       clearTimeout(timer);
+      await agent?.close();
       if ((e as Error).name === "AbortError") throw INGEST_ERRORS.fetchTimeout();
       throw INGEST_ERRORS.fetchFailed();
     }
@@ -138,27 +176,34 @@ async function fetchOnce(rawUrl: string): Promise<SafeFetchResult> {
     if (res.status >= 300 && res.status < 400) {
       const loc = res.headers.get("location");
       res.body?.cancel();
+      await agent?.close();
       if (!loc || hop === MAX_REDIRECTS) throw INGEST_ERRORS.fetchFailed(res.status);
       url = new URL(loc, url); // relative redirects resolved against current
       continue;
     }
     if (!res.ok) {
       res.body?.cancel();
+      await agent?.close();
       throw INGEST_ERRORS.fetchFailed(res.status);
     }
 
     const len = Number(res.headers.get("content-length") ?? 0);
     if (len > MAX_BYTES) {
       res.body?.cancel();
+      await agent?.close();
       throw INGEST_ERRORS.tooLarge();
     }
 
-    const body = await readBodyCapped(res);
-    return {
-      finalUrl: url.toString(),
-      contentType: (res.headers.get("content-type") ?? "").toLowerCase(),
-      body,
-    };
+    try {
+      const body = await readBodyCapped(res);
+      return {
+        finalUrl: url.toString(),
+        contentType: (res.headers.get("content-type") ?? "").toLowerCase(),
+        body,
+      };
+    } finally {
+      await agent?.close();
+    }
   }
   throw INGEST_ERRORS.fetchFailed();
 }

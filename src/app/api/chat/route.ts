@@ -67,8 +67,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // persist the user message + ensure session
-  let sid = sessionId ?? null;
+  // persist the user message + ensure session. A client-supplied sessionId is
+  // untrusted: only reuse it if it actually belongs to THIS twin, otherwise
+  // mint a fresh one (stops writing messages into another twin's session).
+  let sid: string | null = null;
+  if (sessionId) {
+    const { data: owned } = await db
+      .from("chat_sessions")
+      .select("id")
+      .eq("id", sessionId)
+      .eq("twin_id", twin.id)
+      .maybeSingle();
+    sid = owned?.id ?? null;
+  }
   if (!sid) {
     const { data: s } = await db
       .from("chat_sessions")

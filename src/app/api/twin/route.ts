@@ -73,3 +73,19 @@ export async function POST(req: NextRequest) {
 
   return Response.json({ twin });
 }
+
+/** Delete the creator's twin (and, by cascade, its sources, index, wiki,
+ *  conversations, and analytics). The account itself stays. */
+export async function DELETE() {
+  const sb = await supabaseServer();
+  const { data: auth } = await sb.auth.getUser();
+  if (!auth.user) return Response.json({ error: "Sign in first." }, { status: 401 });
+
+  const db = supabaseAdmin();
+  const { error } = await db.from("twins").delete().eq("owner_id", auth.user.id);
+  if (error) {
+    console.error("twin delete error", error);
+    return Response.json({ error: "Couldn't delete your twin." }, { status: 500 });
+  }
+  return Response.json({ ok: true });
+}
