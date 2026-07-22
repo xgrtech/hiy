@@ -135,14 +135,14 @@ export async function reindexTwin(twinId: string): Promise<number> {
   // New version complete → retire the old one.
   await db.from("chunks").delete().eq("twin_id", twinId).lt("index_version", newVersion);
 
-  // Persona depends on interview/correction signal; refresh it whenever
-  // that signal exists. Failure here must never fail indexing.
-  if (sources.some((s) => s.type === "interview" || s.type === "correction")) {
-    try {
-      await synthesizePersona(twinId, task);
-    } catch (e) {
-      console.error("persona synthesis failed (non-fatal)", e);
-    }
+  // Voice comes from ALL of a creator's material, not just interviews — a
+  // blog or transcript reveals how they write. So refresh the persona on
+  // every reindex of a non-empty twin, so even a content-only twin answers
+  // in the creator's voice. Failure here must never fail indexing.
+  try {
+    await synthesizePersona(twinId, task);
+  } catch (e) {
+    console.error("persona synthesis failed (non-fatal)", e);
   }
   return rows.length;
 }

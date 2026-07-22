@@ -125,7 +125,8 @@ async function main() {
   await test("without persona: no HOW YOU SPEAK block (baseline unchanged)", () => {
     const p = buildSystemPrompt(baseOpts);
     assert.ok(!p.includes("HOW YOU SPEAK"));
-    assert.ok(p.includes("AI twin of Zee"));
+    assert.ok(p.includes("Zee's AI twin"));
+    assert.ok(p.includes("FIRST PERSON")); // voice instruction present
     assert.ok(p.includes("I like tea"));
   });
 
@@ -153,7 +154,7 @@ async function main() {
   const { buildSystemPromptParts } = await import("../src/lib/rag/prompt");
   await test("prompt splits into cacheable core + per-question context", () => {
     const { core, context } = buildSystemPromptParts({ ...baseOpts, persona: validPersona });
-    assert.ok(core.includes("AI twin of Zee"), "identity in core");
+    assert.ok(core.includes("Zee's AI twin"), "identity in core");
     assert.ok(core.includes("HOW YOU SPEAK"), "persona in core");
     assert.ok(!core.includes("I like tea"), "retrieved chunks must not pollute the cached core");
     assert.ok(context.includes("I like tea"), "chunks live in the variable context part");
