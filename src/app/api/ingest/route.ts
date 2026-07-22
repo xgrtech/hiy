@@ -4,7 +4,7 @@ import { z } from "zod";
 import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { ingest, ingestFile, IngestError } from "@/lib/ingest";
 import { reindexTwin } from "@/lib/rag/engine";
-import { capsForTwin, checkContentCaps } from "@/lib/caps";
+import { capsForTwin, checkContentCaps, capMessage } from "@/lib/caps";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const maxDuration = 120;
@@ -88,15 +88,9 @@ export async function POST(req: NextRequest) {
 
     const caps = await capsForTwin(twinId);
     const capCheck = await checkContentCaps(twinId, ingested.wordCount, caps, ingested.type);
-    if (capCheck !== "ok") {
+    if (!capCheck.ok) {
       return Response.json(
-        {
-          error:
-            capCheck === "words"
-              ? "This would exceed your plan's training-content limit."
-              : "You've reached your plan's source limit.",
-          code: "cap_exceeded",
-        },
+        { error: capMessage(capCheck), code: "cap_exceeded" },
         { status: 422 }
       );
     }

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { supabaseServer, supabaseAdmin } from "@/lib/supabase/server";
 import { reindexTwin } from "@/lib/rag/engine";
 import { qaToTranscript, qaBoundaries, answeredCount } from "@/lib/interview/format";
-import { capsForTwin, checkContentCaps } from "@/lib/caps";
+import { capsForTwin, checkContentCaps, capMessage } from "@/lib/caps";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const maxDuration = 300;
@@ -59,11 +59,8 @@ export async function POST(req: NextRequest) {
 
   const caps = await capsForTwin(twinId);
   const capCheck = await checkContentCaps(twinId, words, caps, "interview");
-  if (capCheck !== "ok") {
-    return Response.json(
-      { error: "This would exceed your plan's training-content limit.", code: "cap_exceeded" },
-      { status: 422 }
-    );
+  if (!capCheck.ok) {
+    return Response.json({ error: capMessage(capCheck), code: "cap_exceeded" }, { status: 422 });
   }
 
   try {

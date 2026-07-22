@@ -65,12 +65,17 @@ export const SOURCE_COUNT_EXEMPT: ReadonlySet<string> = new Set([
   "correction",
 ]);
 
+export type CapResult =
+  | { ok: true }
+  | { ok: false; kind: "words"; limit: number; used: number; adding: number }
+  | { ok: false; kind: "sources"; limit: number; used: number };
+
 export async function checkContentCaps(
   twinId: string,
   addingWords: number,
   caps: Caps,
   addingType?: string
-): Promise<"ok" | "words" | "sources"> {
+): Promise<CapResult> {
   const db = supabaseAdmin();
   const { data } = await db
     .from("sources")
@@ -79,8 +84,25 @@ export async function checkContentCaps(
   const sources = data ?? [];
   const counted = sources.filter((r) => !SOURCE_COUNT_EXEMPT.has(r.type)).length;
   const addsToCount = addingType ? !SOURCE_COUNT_EXEMPT.has(addingType) : true;
-  if (counted + (addsToCount ? 1 : 0) > caps.max_sources) return "sources";
+  if (counted + (addsToCount ? 1 : 0) > caps.max_sources) {
+    return { ok: false, kind: "sources", limit: caps.max_sources, used: counted };
+  }
   const total = sources.reduce((s, r) => s + (r.word_count ?? 0), 0);
-  if (total + addingWords > caps.max_words) return "words";
-  return "ok";
+  if (total + addingWords > caps.max_words) {
+    return { ok: false, kind: "words", limit: caps.max_words, used: total, adding: addingWords };
+  }
+  return { ok: true };
+}
+
+/** Actionable copy for a failed cap check. */
+export function capMessage(cap: Extract<CapResult, { ok: false }>): string {
+  if (cap.kind === "sources") {
+    return `You've reached your plan's limit of ${cap.limit} sources. Remove one, or upgrade for more room.`;
+  }
+  const over = cap.used + cap.adding - cap.limit;
+  return (
+    `That's about ${cap.adding.toLocaleString()} words. Your plan holds ${cap.limit.toLocaleString()} training words ` +
+    `and you've used ${cap.used.toLocaleString()} — this would go over by ${over.toLocaleString()}. ` +
+    `Trim it to the parts in your voice (your About + experience, not the whole page), remove another source, or upgrade for more room.`
+  );
 }

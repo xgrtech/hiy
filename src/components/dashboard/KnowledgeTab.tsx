@@ -210,6 +210,13 @@ export default function KnowledgeTab({
               }
               className={`mt-3 resize-none ${inputCls}`}
             />
+            {payload.trim() && (
+              <p className="mt-1.5 text-xs text-inkfaint">
+                ≈ {payload.trim().split(/\s+/).filter(Boolean).length.toLocaleString()} words
+                {tab === "linkedin" &&
+                  " — paste just your About + experience, not the whole LinkedIn page."}
+              </p>
+            )}
           </>
         )}
 
