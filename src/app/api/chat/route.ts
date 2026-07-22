@@ -103,7 +103,24 @@ export async function POST(req: NextRequest) {
     persona: safePersona(twin.persona),
   });
 
-  const sources = [...new Set(chunks.filter((c) => c.similarity > 0.25).map((c) => c.source_title))].slice(0, 3);
+  // Passage-level citations: keep the actual grounding text, not just the
+  // source title. One citation per source (its highest-similarity passage),
+  // top 3, so the answer can show the exact evidence it drew on.
+  const SNIPPET = 260;
+  const seen = new Set<string>();
+  const citations: { title: string; snippet: string }[] = [];
+  for (const c of chunks
+    .filter((c) => c.similarity > 0.25)
+    .sort((a, b) => b.similarity - a.similarity)) {
+    if (seen.has(c.source_title)) continue;
+    seen.add(c.source_title);
+    const text = c.content.trim();
+    citations.push({
+      title: c.source_title,
+      snippet: text.length > SNIPPET ? `${text.slice(0, SNIPPET).trimEnd()}…` : text,
+    });
+    if (citations.length >= 3) break;
+  }
 
   // Split system prompt: the twin's identity/persona part is stable, so it
   // prompt-caches across turns and across concurrent visitors of this twin;
@@ -117,7 +134,7 @@ export async function POST(req: NextRequest) {
           session_id: sid,
           role: "assistant",
           content: text,
-          cited_sources: sources,
+          cited_sources: citations,
         });
       }
     },
@@ -125,6 +142,6 @@ export async function POST(req: NextRequest) {
 
   const response = result.toTextStreamResponse();
   response.headers.set("x-session-id", sid ?? "");
-  response.headers.set("x-cited-sources", encodeURIComponent(JSON.stringify(sources)));
+  response.headers.set("x-citations", encodeURIComponent(JSON.stringify(citations)));
   return response;
 }

@@ -7,10 +7,14 @@
 import { useEffect, useRef, useState } from "react";
 import Thinking from "./Thinking";
 
+interface Citation {
+  title: string;
+  snippet: string;
+}
 interface Msg {
   role: "user" | "assistant";
   content: string;
-  sources?: string[];
+  citations?: Citation[];
 }
 
 const DONT_KNOW_RE = /don'?t have that in my knowledge|I don'?t know/i;
@@ -38,6 +42,8 @@ export default function TwinChat({
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // Which citation passage is expanded, keyed by "msgIndex:citeIndex".
+  const [openCite, setOpenCite] = useState<string | null>(null);
   const sessionRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoAsked = useRef(false);
@@ -67,14 +73,14 @@ export default function TwinChat({
         throw new Error(j.error ?? "Something went wrong.");
       }
       sessionRef.current = res.headers.get("x-session-id") || sessionRef.current;
-      let sources: string[] = [];
+      let citations: Citation[] = [];
       try {
-        sources = JSON.parse(
-          decodeURIComponent(res.headers.get("x-cited-sources") ?? "[]")
+        citations = JSON.parse(
+          decodeURIComponent(res.headers.get("x-citations") ?? "[]")
         );
       } catch {}
 
-      setMessages((m) => [...m, { role: "assistant", content: "", sources }]);
+      setMessages((m) => [...m, { role: "assistant", content: "", citations }]);
       const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       for (;;) {
@@ -159,19 +165,48 @@ export default function TwinChat({
                   </p>
                 ) : (
                   m.role === "assistant" &&
-                  m.sources &&
-                  m.sources.length > 0 &&
+                  m.citations &&
+                  m.citations.length > 0 &&
                   m.content && (
-                    <p className="ml-9 mt-1.5 flex flex-wrap gap-1.5">
-                      {m.sources.map((s) => (
-                        <span
-                          key={s}
-                          className="rounded-full bg-paper px-2.5 py-1 text-[10px] font-medium text-inksoft"
-                        >
-                          ⌘ From: {s}
-                        </span>
-                      ))}
-                    </p>
+                    <div className="ml-9 mt-1.5">
+                      <p className="flex flex-wrap gap-1.5">
+                        {m.citations.map((c, ci) => {
+                          const key = `${i}:${ci}`;
+                          const open = openCite === key;
+                          return (
+                            <button
+                              key={key}
+                              onClick={() => setOpenCite(open ? null : key)}
+                              aria-expanded={open}
+                              className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition ${
+                                open
+                                  ? "bg-accentsoft text-accentdeep"
+                                  : "bg-paper text-inksoft hover:bg-accentsoft hover:text-accentdeep"
+                              }`}
+                            >
+                              ⌘ From: {c.title}
+                            </button>
+                          );
+                        })}
+                      </p>
+                      {m.citations.map((c, ci) => {
+                        const key = `${i}:${ci}`;
+                        if (openCite !== key) return null;
+                        return (
+                          <figure
+                            key={`p-${key}`}
+                            className="mt-1.5 rounded-xl border border-line bg-paper px-3.5 py-2.5"
+                          >
+                            <blockquote className="text-xs leading-relaxed text-inksoft">
+                              &ldquo;{c.snippet}&rdquo;
+                            </blockquote>
+                            <figcaption className="mt-1 text-[10px] font-medium text-inkfaint">
+                              — {c.title}
+                            </figcaption>
+                          </figure>
+                        );
+                      })}
+                    </div>
                   )
                 )}
               </div>
