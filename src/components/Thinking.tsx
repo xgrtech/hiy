@@ -20,6 +20,7 @@ export default function Thinking({
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync to reduced-motion on mount
     setPaused(mq.matches);
     const onChange = () => setPaused(mq.matches);
     mq.addEventListener("change", onChange);

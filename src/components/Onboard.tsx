@@ -19,6 +19,7 @@ export default function Onboard() {
   useEffect(() => {
     try {
       const pending = localStorage.getItem("hiy-claim");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- read pending claim on mount
       if (pending) setClaimSlug(pending);
     } catch {
       /* private mode — no pending claim */

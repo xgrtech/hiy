@@ -40,6 +40,7 @@ export default function InterviewFlow({
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null");
       if (saved?.qa?.length) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restore saved progress on mount
         setQa(saved.qa);
         setIdx(saved.idx ?? saved.qa.length);
       }

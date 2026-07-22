@@ -131,8 +131,10 @@ export default function Landing() {
           <em className="text-accent">even when you can&apos;t be.</em>
         </h1>
         <p className="relative mx-auto mt-6 max-w-xl text-lg leading-relaxed text-inksoft">
-          hiy learns from everything you&apos;ve written, recorded, and said —
-          then answers your people in your words, any hour, anywhere. Honestly.
+          hiy turns your writing, talks, and videos into a twin that answers
+          the questions you get asked over and over — cited, honest, and ready
+          the moment you&apos;re not. It turns repeat questions into real
+          conversations.
         </p>
         <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href="/app" className="btn-warm press px-7 py-3.5 text-sm">

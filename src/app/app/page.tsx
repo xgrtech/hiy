@@ -37,7 +37,9 @@ export default async function AppPage() {
     );
   }
 
-  const since14 = new Date(Date.now() - 14 * 86_400_000).toISOString();
+  // Request-time windows in a force-dynamic server component (runs per
+  // request, so wall-clock reads are intentional here).
+  // eslint-disable-next-line react-hooks/purity
   const since7 = new Date(Date.now() - 7 * 86_400_000).toISOString();
 
   const [
@@ -82,6 +84,7 @@ export default async function AppPage() {
   // sessions per day, last 14 days
   const days: DayCount[] = [];
   for (let i = 13; i >= 0; i--) {
+    // eslint-disable-next-line react-hooks/purity -- request-time date, server component
     const d = new Date(Date.now() - i * 86_400_000);
     const key = d.toISOString().slice(0, 10);
     days.push({

@@ -54,6 +54,7 @@ export default function ExampleTwinCard({
     ) {
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- enable motion after mount (reduced-motion/JS gate)
     setAnimated(true);
     const io = new IntersectionObserver(
       (entries) => setVisible(entries.some((e) => e.isIntersecting)),

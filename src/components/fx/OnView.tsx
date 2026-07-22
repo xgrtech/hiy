@@ -35,6 +35,7 @@ export default function OnView({
       },
       { threshold: 0.3 }
     );
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- arm the entrance after mount (progressive, JS-gated)
     setPhase("prep");
     io.observe(el);
     return () => io.disconnect();

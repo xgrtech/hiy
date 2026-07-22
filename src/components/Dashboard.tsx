@@ -86,6 +86,8 @@ export default function Dashboard({
   const [planOpen, setPlanOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false); // mobile drawer
   const [theme, setThemeState] = useState<Theme>("light");
+  // Sync the menu label to the theme applied pre-paint by the layout script.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setThemeState(currentTheme()), []);
   const hasInterview = sources.some((s) => s.type === "interview");
   const firstName = twin.name.split(" ")[0];

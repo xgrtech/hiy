@@ -10,6 +10,8 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Sync to the pre-paint theme on mount (browser-only value).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(currentTheme());
     setMounted(true);
   }, []);
