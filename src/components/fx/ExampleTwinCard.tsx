@@ -7,6 +7,7 @@
  * exchange settled, static.
  */
 import { useEffect, useRef, useState } from "react";
+import { Quote } from "lucide-react";
 
 export interface MockExchange {
   q: string;
@@ -133,7 +134,9 @@ export default function ExampleTwinCard({
               {ex.a}
               <span className="mt-1.5 block">
                 {ex.cite ? (
-                  <span className="chip-cite">⌘ From: {ex.cite}</span>
+                  <span className="chip-cite">
+                    <Quote className="h-2.5 w-2.5" /> From: {ex.cite}
+                  </span>
                 ) : (
                   <span className="chip-idk">honest by default</span>
                 )}

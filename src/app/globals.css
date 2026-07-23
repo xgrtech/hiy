@@ -68,6 +68,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ---------- focus system (Stripe-style rings) ----------
+   Inputs get a soft accent ring on focus (works even where markup sets
+   outline-none); keyboard-focused buttons/links get a visible outline. */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
 /* ---------- ambient gradient wash (all pages) ---------- */
 /* Grabient-style soft pastel wash: cool mist from one corner, peach→rose
    flowing from the opposite one, a faint sage cross-current. Painted on a

@@ -3,8 +3,7 @@
  *  tiles), a live/draft hero, recent conversations, and the teach queue.
  *  All real data. */
 import { useState } from "react";
-import { Copy, Check, Sparkles } from "lucide-react";
-import { MessageSquare } from "lucide-react";
+import { Copy, Check, Sparkles, MessageSquare, ArrowUpRight } from "lucide-react";
 import PublishButton from "./PublishButton";
 import OnboardingChecklist from "./OnboardingChecklist";
 import type { TwinRecord, SourceRecord, AppStats } from "./types";
@@ -95,9 +94,9 @@ export default function DashboardHome({
               </button>
               <button
                 onClick={openSettings}
-                className="rounded-full px-3 py-1.5 text-xs font-medium text-inksoft transition hover:text-ink"
+                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-inksoft transition hover:text-ink"
               >
-                Embed →
+                Embed <ArrowUpRight className="h-3.5 w-3.5" />
               </button>
               <PublishButton
                 publish={false}

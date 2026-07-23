@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, X } from "lucide-react";
 import Thinking from "../Thinking";
 
 interface Item {
@@ -226,8 +227,8 @@ export default function BulkImport({ twinId }: { twinId: string }) {
                   </span>
                   <span className="shrink-0 text-xs">
                     {row?.status === "importing" && <span className="text-inkfaint">importing…</span>}
-                    {row?.status === "done" && <span className="text-accent">✓</span>}
-                    {row?.status === "error" && <span className="text-accent2">✗</span>}
+                    {row?.status === "done" && <Check className="h-4 w-4 text-green" />}
+                    {row?.status === "error" && <X className="h-4 w-4 text-accent" />}
                   </span>
                 </li>
               );

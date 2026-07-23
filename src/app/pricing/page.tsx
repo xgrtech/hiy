@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 
 /* Pricing per "Hiy Mockups.dc.html" §1b. Billing isn't wired yet (Stripe is
    phase 3): every CTA routes to /app and paid tiers are labeled "soon" so
@@ -111,8 +112,11 @@ export default function PricingPage() {
             </p>
             <ul className={`mt-5 space-y-2.5 text-[13px] ${t.dark ? "text-white/75" : "text-inksoft"}`}>
               {t.features.map((f) => (
-                <li key={f} className="flex gap-2">
-                  <span className={t.dark ? "text-accent" : "text-green"}>✓</span> {f}
+                <li key={f} className="flex items-start gap-2">
+                  <Check
+                    className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${t.dark ? "text-accent" : "text-green"}`}
+                  />
+                  {f}
                 </li>
               ))}
             </ul>

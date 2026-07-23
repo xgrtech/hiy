@@ -5,6 +5,7 @@
  * honest "I don't know" replies get the dashed treatment.
  */
 import { useEffect, useRef, useState } from "react";
+import { ArrowUp, Quote } from "lucide-react";
 import Thinking from "./Thinking";
 
 interface Citation {
@@ -178,13 +179,13 @@ export default function TwinChat({
                               key={key}
                               onClick={() => setOpenCite(open ? null : key)}
                               aria-expanded={open}
-                              className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition ${
+                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium transition ${
                                 open
                                   ? "bg-accentsoft text-accentdeep"
                                   : "bg-paper text-inksoft hover:bg-accentsoft hover:text-accentdeep"
                               }`}
                             >
-                              ⌘ From: {c.title}
+                              <Quote className="h-2.5 w-2.5" /> From: {c.title}
                             </button>
                           );
                         })}
@@ -231,7 +232,7 @@ export default function TwinChat({
           className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white transition hover:bg-accentdeep disabled:opacity-40"
           aria-label="Send"
         >
-          ↑
+          <ArrowUp className="h-4 w-4" />
         </button>
       </div>
 

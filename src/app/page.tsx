@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { Quote, ArrowUpRight } from "lucide-react";
 import InstantTwin from "@/components/InstantTwin";
-import ParticleWordmark from "@/components/fx/ParticleWordmark";
 import ExampleTwinCard from "@/components/fx/ExampleTwinCard";
 import OnView from "@/components/fx/OnView";
 import PlatformMock from "@/components/fx/PlatformMock";
@@ -18,7 +18,9 @@ const FEATURED = [
     t: "Cites its sources",
     d: "Every grounded answer links back to the talk, post, or chapter it came from — by default, never a paid add-on.",
     artifact: (
-      <span className="chip-cite">⌘ From: Pricing 101 — blog</span>
+      <span className="chip-cite">
+        <Quote className="h-2.5 w-2.5" /> From: Pricing 101 — blog
+      </span>
     ),
   },
   {
@@ -89,7 +91,8 @@ const STEPS = [
     d: "Get hiy.ai/you — a link anyone can visit. Or drop the widget straight onto your site.",
     art: (
       <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[11px] text-white/80">
-        hiy.ai/<b className="text-white">you</b> <span className="text-accent">↗</span>
+        hiy.ai/<b className="text-white">you</b>{" "}
+        <ArrowUpRight className="h-3 w-3 text-accent" />
       </span>
     ),
   },
@@ -151,11 +154,6 @@ export default function Landing() {
           >
             Try a 30-second preview
           </a>
-          {/* the signature: scattered motes assemble into "hiy." — sits beside
-              the CTA, scatter it with the cursor and it reforms */}
-          <div className="relative ml-1 hidden h-16 w-36 sm:block" aria-hidden>
-            <ParticleWordmark className="pointer-events-none absolute inset-0 h-full w-full" />
-          </div>
         </div>
         <p className="relative mt-4 text-xs text-inkfaint">
           Live in under 5 minutes · No credit card

@@ -3,6 +3,7 @@
  *  (Step 2 = feed content, in the app's Training page; step 3 = go live.) */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
 
 export default function Onboard() {
   const router = useRouter();
@@ -104,7 +105,11 @@ export default function Onboard() {
             placeholder="your-name"
             className="flex-1 bg-transparent font-medium outline-none"
           />
-          {username && slugOk && <span className="text-xs font-semibold text-green">✓ looks good</span>}
+          {username && slugOk && (
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-green">
+              <Check className="h-3.5 w-3.5" /> looks good
+            </span>
+          )}
         </div>
         <input
           value={name}

@@ -1,6 +1,7 @@
 /** Public hiy profile per "Hiy Mockups" §4a/5b: hiy.ai/{username}. */
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { supabaseAdmin, supabaseServer } from "@/lib/supabase/server";
 import TwinChat from "@/components/TwinChat";
 import ClaimCTA from "@/components/ClaimCTA";
@@ -132,9 +133,9 @@ export default async function TwinPage({
                     href={l.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-full border border-line bg-surface px-3 py-1 text-xs text-inksoft transition hover:border-accent hover:text-accent"
+                    className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-3 py-1 text-xs text-inksoft transition hover:border-accent hover:text-accent"
                   >
-                    {l.label} ↗
+                    {l.label} <ArrowUpRight className="h-3 w-3" />
                   </a>
                 ))}
               </p>

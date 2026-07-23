@@ -100,9 +100,9 @@ function seedParticles(word: string, width: number, height: number): Particle[] 
     pull: 0.012 + noise(index, 3) * 0.032,
     drift: 0.6 + noise(index, 4) * 1.4,
     phase: noise(index, 5) * Math.PI * 2,
-    size: 1.1 + noise(index, 6) * 1.2,
-    // Light background: ink/terracotta carry the word — solid, not dirt.
-    alpha: 0.55 + noise(index, 7) * 0.35,
+    size: 1.3 + noise(index, 6) * 1.3,
+    // Light background: ink/indigo carry the word — solid, not dirt.
+    alpha: 0.7 + noise(index, 7) * 0.3,
     accent: noise(index, 8) > 0.4,
   }));
 

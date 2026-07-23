@@ -5,6 +5,7 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import Thinking from "./Thinking";
 
 export default function InstantTwin() {
@@ -97,7 +98,13 @@ export default function InstantTwin() {
           disabled={busy}
           className="btn-warm mt-3.5 w-full px-6 py-3 text-sm disabled:opacity-50"
         >
-          {busy ? "Building your preview hiy…" : "Meet your hiy →"}
+          {busy ? (
+            "Building your preview hiy…"
+          ) : (
+            <>
+              Meet your hiy <ArrowRight className="h-4 w-4" />
+            </>
+          )}
         </button>
       </div>
     </div>
