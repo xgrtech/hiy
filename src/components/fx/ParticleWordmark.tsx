@@ -61,7 +61,7 @@ function sampleWord(word: string, width: number, height: number): { x: number; y
   let fontSize = Math.min(height * 0.72, width * 0.3);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const font = (size: number) => `400 ${size}px "Instrument Serif", Georgia, serif`;
+  const font = (size: number) => `700 ${size}px "Inter", system-ui, sans-serif`;
   ctx.font = font(fontSize);
   const maxWidth = width * 0.9;
   const measured = ctx.measureText(word).width;

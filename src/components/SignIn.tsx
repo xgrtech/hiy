@@ -107,7 +107,7 @@ export default function SignIn() {
   if (sentTo) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.08)]">
+        <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(10,37,64,.05),0_24px_60px_rgba(10,37,64,.08)]">
           <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-greensoft text-3xl">
             ✉️
           </span>
@@ -154,7 +154,7 @@ export default function SignIn() {
       <div className="absolute right-5 top-5">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.08)]">
+      <div className="w-full max-w-sm rounded-3xl border border-line bg-surface p-8 text-center shadow-[0_2px_8px_rgba(10,37,64,.05),0_24px_60px_rgba(10,37,64,.08)]">
         <div className="orb mx-auto mb-5 h-16 w-16" />
         <h1 className="font-display text-3xl">
           {mode === "signin" ? "Welcome back" : "Create your hiy"}

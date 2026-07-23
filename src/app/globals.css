@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
-/* Mockup-sourced tokens ("Hiy Mockups.dc.html"): warm paper neutrals, one
-   terracotta accent; Instrument Serif display + Instrument Sans UI. */
+/* Stripe-direction tokens: cool near-white canvas, white cards, navy ink,
+   one deep-indigo accent (deliberately NOT blurple #635bff), soft cool
+   shadows. Inter carries all type. */
 :root {
-  --paper: #f0ede8;
-  --surface: #ffffff;
-  --surface-2: #e9e4dc;
-  --ink: #211d18;
-  --ink-soft: #6b645b;
-  --ink-faint: #7c746a; /* darkened from #9a938a for legibility on paper */
-  --line: #e2ddd4;
-  --dark: #211d18;
-  --accent: #c2542f; /* terracotta — THE accent */
-  --accent-2: #c2542f; /* legacy alias */
-  --accent-deep: #a8461f;
-  --accent-soft: #f6e4dc;
-  --green: #2f7a4f; /* live-status + citation trust marks only */
-  --green-soft: #e3efe7;
+  --paper: #f6f9fc; /* Stripe's cool page tint */
+  --surface: #ffffff; /* cards, rail, panels */
+  --surface-2: #eef2f7;
+  --ink: #0a2540; /* Stripe navy-black */
+  --ink-soft: #425466;
+  --ink-faint: #5b6b83;
+  --line: #e3e8ef;
+  --dark: #0a2540; /* dark sections/cards are navy, not black */
+  --accent: #4f46e5; /* deep indigo — THE accent */
+  --accent-2: #4f46e5; /* legacy alias */
+  --accent-deep: #4338ca;
+  --accent-soft: #eef2ff;
+  --green: #059669; /* live-status + citation trust marks only */
+  --green-soft: #ecfdf5;
 }
 
 @theme inline {
@@ -34,38 +35,36 @@
   --color-accentsoft: var(--accent-soft);
   --color-green: var(--green);
   --color-greensoft: var(--green-soft);
-  --font-sans: "Instrument Sans", system-ui, sans-serif;
-  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Inter", system-ui, sans-serif;
 }
 
-/* ---------- dark theme (claude.ai's warm charcoal — not black) ----------
-   Canvas is a warm dark gray, cards sit a step lighter (adapted, not
-   recolored), text is warm ivory, and the accent is Anthropic's clay coral
-   for small marks only. Every semantic token is remapped here, so
-   `bg-paper`, `text-ink`, `border-line` etc. flip app-wide, no component
-   changes. */
+/* ---------- dark theme ("Stripe at night": cool navy-slate) ----------
+   Cool deep-navy canvas, panels a step lighter, indigo lifted for contrast.
+   Every semantic token remaps here, so the whole app flips with no
+   per-component work. */
 :root[data-theme="dark"] {
-  --paper: #262624; /* claude canvas — warm charcoal */
-  --surface: #30302e; /* cards/rail sit a step lighter */
-  --surface-2: #3a3a37;
-  --ink: #f5f3ec; /* warm ivory */
-  --ink-soft: #bdb9ae;
-  --ink-faint: #8a857c;
-  --line: #423f3a;
-  --dark: #1d1c1a; /* bg-dark elements → a darker warm panel */
-  --accent: #d97757; /* Anthropic clay coral — small accents only */
-  --accent-2: #d97757;
-  --accent-deep: #c15f3f;
-  --accent-soft: #3a2419;
-  --green: #7fae72;
-  --green-soft: #26301f;
+  --paper: #0a121f;
+  --surface: #101a2b;
+  --surface-2: #17233a;
+  --ink: #eef2f7;
+  --ink-soft: #9aa7ba;
+  --ink-faint: #75839a;
+  --line: #223148;
+  --dark: #060b14;
+  --accent: #6366f1; /* indigo lifted for dark-canvas legibility */
+  --accent-2: #6366f1;
+  --accent-deep: #4f46e5;
+  --accent-soft: #232a54;
+  --green: #10b981;
+  --green-soft: #0d2b22;
   color-scheme: dark;
 }
 
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -76,10 +75,10 @@ body {
    Each page varies the ANGLE via a tiny marker class read with :has() —
    browsers without :has() gracefully keep the default 225°. */
 :root {
-  --wash-peach: #f5d8c0;
-  --wash-rose: #eed3d0;
-  --wash-sage: #d7e5db;
-  --wash-mist: #d3dce4;
+  --wash-peach: #e4e9ff; /* periwinkle */
+  --wash-rose: #fbe7f6; /* soft pink */
+  --wash-sage: #dff5ee; /* mint */
+  --wash-mist: #dcecfd; /* sky */
 }
 body::before {
   content: "";
@@ -87,6 +86,7 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  opacity: 0.5; /* Stripe canvas stays clean — the wash is a whisper */
   --wa: 225deg;
   background:
     linear-gradient(
@@ -127,13 +127,12 @@ body:has(.wash-none)::before {
     linear-gradient(115deg, color-mix(in oklab, var(--accent) 6%, transparent), transparent 58%),
     var(--paper);
 }
-/* Dark wash: barely-there warm breath in the corners over the charcoal, so
-   it isn't a dead flat field. Very restrained — claude's dark is calm. */
+/* Dark wash: barely-there cool breath over the navy so it isn't flat. */
 :root[data-theme="dark"] {
-  --wash-peach: #33261d;
-  --wash-rose: #2e2226;
-  --wash-sage: #22301f;
-  --wash-mist: #232a33;
+  --wash-peach: #1a2140;
+  --wash-rose: #23182f;
+  --wash-sage: #10282b;
+  --wash-mist: #14213a;
 }
 :root[data-theme="dark"] body::before { opacity: 0.35; }
 :root[data-theme="dark"] body:has(.wash-dawn)::before { opacity: 0.2; }
@@ -141,9 +140,12 @@ body:has(.wash-none)::before {
    them so they read as a faint warm haze, not a blown-out white bloom. */
 :root[data-theme="dark"] .hero-glow { opacity: 0.18; filter: saturate(0.4) brightness(0.6); }
 
+/* Stripe-style display: same family as UI, heavier + tighter. Everything
+   already tagged .font-display converts automatically. */
 .font-display {
-  font-family: "Instrument Serif", Georgia, serif;
-  font-weight: 400;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 /* ---------- brand objects: arch card · artifacts · canvas · CTAs ---------- */
@@ -154,9 +156,9 @@ body:has(.wash-none)::before {
 }
 .arch-shadow {
   box-shadow:
-    0 1px 2px rgba(28, 27, 24, 0.05),
-    0 24px 70px rgba(28, 27, 24, 0.16),
-    0 60px 130px rgba(31, 86, 72, 0.1);
+    0 1px 2px rgba(10, 37, 64, 0.05),
+    0 24px 70px rgba(10, 37, 64, 0.16),
+    0 60px 130px rgba(79, 70, 229, 0.1);
 }
 /* Floating artifact chips: tilted evidence scattered around a hero.
    Set --tilt (and optionally --float-delay) inline per chip. */
@@ -171,7 +173,7 @@ body:has(.wash-none)::before {
   font-size: 12px;
   line-height: 1.35;
   color: var(--ink-soft);
-  box-shadow: 0 14px 40px rgba(28, 27, 24, 0.12);
+  box-shadow: 0 14px 40px rgba(10, 37, 64, 0.12);
   animation: artifact-float 7s ease-in-out infinite;
   animation-delay: var(--float-delay, 0s);
   pointer-events: none;
@@ -186,52 +188,70 @@ body:has(.wash-none)::before {
   background: color-mix(in oklab, var(--surface) 42%, var(--paper));
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--line) 70%, transparent);
 }
-/* Filled arch dome — Delphi's dome carries a photo; ours carries a living
-   gradient field so the arch never reads as empty marble. */
+/* Filled arch dome — a cool indigo-tinted field so the arch never reads as
+   empty marble. */
 .dome {
   background:
-    radial-gradient(90% 90% at 50% 0%, #f6ddcb 0%, transparent 62%),
-    radial-gradient(70% 60% at 18% 30%, color-mix(in oklab, #efd3c6 75%, transparent) 0%, transparent 60%),
-    radial-gradient(80% 70% at 85% 22%, color-mix(in oklab, #e3dcd2 75%, transparent) 0%, transparent 58%),
-    linear-gradient(180deg, #f4e8dd 0%, var(--surface) 92%);
+    radial-gradient(90% 90% at 50% 0%, #e0e7ff 0%, transparent 62%),
+    radial-gradient(70% 60% at 18% 30%, color-mix(in oklab, #ede9fe 75%, transparent) 0%, transparent 60%),
+    radial-gradient(80% 70% at 85% 22%, color-mix(in oklab, #e0f2fe 75%, transparent) 0%, transparent 58%),
+    linear-gradient(180deg, #eef2ff 0%, var(--surface) 92%);
 }
-/* Dark dome: a soft warm clay glow rising out of the charcoal panel. */
+/* Dark dome: a soft indigo glow rising out of the navy panel. */
 :root[data-theme="dark"] .dome {
   background:
-    radial-gradient(90% 90% at 50% 0%, color-mix(in oklab, var(--accent) 22%, transparent) 0%, transparent 62%),
-    linear-gradient(180deg, #34302c 0%, var(--surface) 92%);
+    radial-gradient(90% 90% at 50% 0%, color-mix(in oklab, var(--accent) 24%, transparent) 0%, transparent 62%),
+    linear-gradient(180deg, #17233a 0%, var(--surface) 92%);
 }
-/* Mockup avatar ring: white inner ring + soft terracotta halo. */
+/* Avatar ring: white inner ring + soft indigo halo. */
 .ring-ava {
   border: 3px solid #fff;
   box-shadow:
-    0 0 0 2.5px color-mix(in oklab, var(--accent) 60%, #b06bc4),
-    0 14px 40px rgba(194, 84, 47, 0.25);
+    0 0 0 2.5px color-mix(in oklab, var(--accent) 70%, #a855f7),
+    0 14px 40px rgba(79, 70, 229, 0.25);
 }
-/* Primary CTA: solid ink (claude.ai/chatgpt style) — near-black in light,
-   near-white in dark, always readable against its own foreground token.
-   Terracotta is kept for small accents (active nav, links, chips), never
-   as a big button fill. */
+/* Primary CTA: Stripe-style indigo pill. (Class name kept for churn-free
+   adoption across the app.) */
 .btn-warm {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: #fff;
   border-radius: 999px;
   font-weight: 600;
-  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, opacity 0.18s ease;
-  box-shadow: 0 6px 20px color-mix(in oklab, var(--ink) 22%, transparent);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease, background 0.18s ease;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.28);
 }
 .btn-warm:hover {
   transform: translateY(-2px);
-  opacity: 0.9;
-  box-shadow: 0 12px 30px color-mix(in oklab, var(--ink) 28%, transparent);
+  background: var(--accent-deep);
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
 }
 .btn-warm:disabled {
   opacity: 0.5;
   transform: none;
+}
+
+/* ---------- gradient band (the Stripe signature) ----------
+   One vivid diagonal gradient moment, contained to the hero. Slow drift
+   via background-position (paused for reduced motion). */
+.gradient-band {
+  background: linear-gradient(
+    115deg,
+    #6f6bf2 0%,
+    #a163e9 26%,
+    #f56fa1 52%,
+    #ffb45c 78%,
+    #6fd6f2 100%
+  );
+  background-size: 220% 220%;
+  animation: band-drift 16s ease-in-out infinite alternate;
+}
+@keyframes band-drift {
+  from { background-position: 0% 0%; }
+  to { background-position: 100% 100%; }
 }
 
 /* ---------- border beam (the "Pulse" signature) ----------
@@ -332,10 +352,10 @@ body:has(.wash-none)::before {
 .orb {
   position: relative;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #f2bb97 0%, #d97748 40%, #a8461f 80%);
+  background: radial-gradient(circle at 34% 28%, #a5b4fc 0%, #6366f1 40%, #4338ca 80%);
   box-shadow:
-    0 22px 60px rgba(194, 84, 47, 0.3),
-    inset 0 -12px 34px rgba(0, 0, 0, 0.22),
+    0 22px 60px rgba(79, 70, 229, 0.32),
+    inset 0 -12px 34px rgba(10, 20, 60, 0.28),
     inset 0 12px 26px rgba(255, 255, 255, 0.45);
   animation: orb-breathe 5.5s ease-in-out infinite;
 }
@@ -344,7 +364,7 @@ body:has(.wash-none)::before {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at 68% 72%, rgba(248, 214, 188, 0.95), transparent 52%);
+  background: radial-gradient(circle at 68% 72%, rgba(196, 205, 255, 0.95), transparent 52%);
   mix-blend-mode: screen;
   animation: orb-drift 9s ease-in-out infinite alternate;
 }
@@ -436,7 +456,7 @@ body:has(.wash-none)::before {
 }
 .lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 14px 40px rgba(33, 29, 24, 0.1);
+  box-shadow: 0 14px 40px rgba(10, 37, 64, 0.1);
 }
 
 /* On-view choreography (bars/chips inside cards). .ov-prep is ONLY added
@@ -526,4 +546,5 @@ body:has(.wash-none)::before {
   }
   .dialog-overlay, .dialog-content { animation: none !important; }
   .beam::before, .beam::after { animation: none !important; }
+  .gradient-band { animation: none !important; }
 }

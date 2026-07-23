@@ -4,6 +4,7 @@ import InstantTwin from "@/components/InstantTwin";
 import ParticleWordmark from "@/components/fx/ParticleWordmark";
 import ExampleTwinCard from "@/components/fx/ExampleTwinCard";
 import OnView from "@/components/fx/OnView";
+import PlatformMock from "@/components/fx/PlatformMock";
 import ThemeToggle from "@/components/ThemeToggle";
 
 /* Landing per "Hiy Mockups.dc.html" §1a — warm & human, one terracotta
@@ -121,10 +122,15 @@ export default function Landing() {
         </div>
       </nav>
 
+      {/* Stripe-signature diagonal gradient band: one vivid moment, sweeping
+          the hero's top-right, content sits above it. */}
+      <div
+        aria-hidden
+        className="gradient-band pointer-events-none absolute -top-64 right-[-22%] h-[420px] w-[58%] -rotate-[12deg] rounded-[56px] opacity-90"
+      />
+
       {/* hero */}
       <header className="relative mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pt-20">
-        <div className="hero-glow pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-accentsoft blur-3xl" aria-hidden />
-        <div className="hero-glow pointer-events-none absolute -right-40 top-24 h-96 w-96 rounded-full bg-[#e7e0f0] blur-3xl" aria-hidden />
         <h1 className="font-display relative text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] tracking-[-0.01em] [text-wrap:balance]">
           Be there for everyone,
           <br />
@@ -199,6 +205,20 @@ export default function Landing() {
               },
             ]}
           />
+        </div>
+      </section>
+
+      {/* the product itself — Stripe-style platform mockup */}
+      <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
+        <h2 className="font-display text-center text-[clamp(1.9rem,3.5vw,2.6rem)] [text-wrap:balance]">
+          The dashboard behind every hiy
+        </h2>
+        <p className="mx-auto mt-2 max-w-lg text-center text-sm text-inksoft">
+          Watch conversations arrive, see what it couldn&apos;t answer, teach it,
+          and publish — from one calm page.
+        </p>
+        <div className="mt-10">
+          <PlatformMock />
         </div>
       </section>
 

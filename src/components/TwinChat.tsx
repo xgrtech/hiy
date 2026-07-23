@@ -217,7 +217,7 @@ export default function TwinChat({
 
       {error && <p className="mb-2 text-xs text-accent">{error}</p>}
 
-      <div className="flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-5 pr-1.5 shadow-[0_2px_10px_rgba(33,29,24,.06)]">
+      <div className="flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-5 pr-1.5 shadow-[0_2px_10px_rgba(10,37,64,.06)]">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}

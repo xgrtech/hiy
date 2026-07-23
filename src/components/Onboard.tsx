@@ -70,7 +70,7 @@ export default function Onboard() {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-10">
-      <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-8 shadow-[0_2px_8px_rgba(33,29,24,.05),0_24px_60px_rgba(33,29,24,.08)]">
+      <div className="w-full max-w-md rounded-3xl border border-line bg-surface p-8 shadow-[0_2px_8px_rgba(10,37,64,.05),0_24px_60px_rgba(10,37,64,.08)]">
         <div className="flex items-center justify-between">
           <span className="font-display text-xl">
             hiy<span className="text-accent">.ai</span>

@@ -95,7 +95,7 @@ export default function PricingPage() {
             key={t.name}
             className={`lift relative rounded-2xl border p-6 ${
               t.dark
-                ? "border-dark bg-dark text-white shadow-[0_24px_60px_rgba(33,29,24,.25)]"
+                ? "border-dark bg-dark text-white shadow-[0_24px_60px_rgba(10,37,64,.25)]"
                 : "border-line bg-surface"
             }`}
           >

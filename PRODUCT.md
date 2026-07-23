@@ -14,12 +14,13 @@ Creators, coaches, founders, and experts who get the same questions endlessly. h
 
 Warm · candid · crafted. A well-made linen notebook, not a chrome dashboard; a person who says "I don't know" without flinching.
 
-## Visual identity (committed — identity-preservation applies)
+## Visual identity (committed 2026-07-23 — Stripe direction; identity-preservation applies)
 
-- Warm paper canvas `#f4f1ea`, ink `#1c1b18`, forest green `--accent #1f5648` (trust: citations, product actions), terracotta `--accent-2 #c8613a` (energy: marketing CTAs, highlights).
-- Fraunces (display serif) + Inter (UI). Committed pairing; do not swap by reflex.
-- Signature elements: the living **orb** (twin presence), the **arch card** (portrait/profile frame, Delphi-caliber hero object), floating **artifact chips** (content stats, visitor questions, citation + "I don't know" moments), soft directional pastel **wash** per page.
-- Color strategy: Committed — terracotta carries marketing heroes; green carries trust moments; paper carries everything else.
+- **Reference: Stripe.** Cool near-white canvas `#f6f9fc`, white cards, navy ink `#0a2540`, one deep-indigo accent `#4f46e5` (deliberately NOT blurple #635bff), emerald `#059669` for trust marks (citations, live status) only. Dark mode is "Stripe at night": navy-slate `#0a121f` canvas, indigo lifted to `#6366f1`.
+- **Inter carries all type** (display = heavier weight + tight tracking, not a second family).
+- **One vivid gradient moment**: the diagonal hero band (indigo→violet→pink→amber→cyan), contained to the landing hero's corner. Never repeated elsewhere; no gradient text, ever.
+- Signature elements kept: the living **orb** (now indigo), citation chips + the dashed honest "I don't know" treatment, the platform mockup (browser + floating phone) built from real UI vocabulary.
+- Color strategy: Restrained — indigo for primary actions/selection, green for trust, navy for dark panels, everything else neutral.
 
 ## Anti-references
 

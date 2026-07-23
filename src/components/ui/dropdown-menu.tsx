@@ -17,7 +17,7 @@ function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          "dialog-content z-50 min-w-56 rounded-xl border border-line bg-surface p-1.5 shadow-[0_16px_44px_rgba(33,29,24,.18)]",
+          "dialog-content z-50 min-w-56 rounded-xl border border-line bg-surface p-1.5 shadow-[0_16px_44px_rgba(10,37,64,.18)]",
           "focus:outline-none",
           className
         )}

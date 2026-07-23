@@ -38,7 +38,7 @@ function DialogContent({
       <DialogPrimitive.Content
         className={cn(
           "dialog-content fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5",
-          "rounded-2xl border border-line bg-surface p-6 shadow-[0_24px_70px_rgba(33,29,24,.22)]",
+          "rounded-2xl border border-line bg-surface p-6 shadow-[0_24px_70px_rgba(10,37,64,.22)]",
           "focus:outline-none",
           className
         )}

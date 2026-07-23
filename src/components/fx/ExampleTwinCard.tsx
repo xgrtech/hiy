@@ -88,7 +88,7 @@ export default function ExampleTwinCard({
   return (
     <div
       ref={ref}
-      className="lift hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_2px_8px_rgba(33,29,24,.05)] lg:block"
+      className="lift hidden overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_2px_8px_rgba(10,37,64,.05)] lg:block"
     >
       <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
         <span
