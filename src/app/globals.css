@@ -482,6 +482,11 @@ body:has(.wash-none)::before {
   transition-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* Theme-aware demo screenshots: show the one that matches the theme. */
+.demo-dark { display: none; }
+:root[data-theme="dark"] .demo-light { display: none; }
+:root[data-theme="dark"] .demo-dark { display: block; }
+
 /* ---------- dialog (Radix) ---------- */
 .dialog-overlay[data-state="open"] { animation: dlg-fade 0.18s var(--ease-out-quint); }
 .dialog-overlay[data-state="closed"] { animation: dlg-fade 0.15s var(--ease-out-quint) reverse; }

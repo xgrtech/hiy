@@ -137,10 +137,9 @@ export default function Landing() {
           <em className="text-accent">even when you can&apos;t be.</em>
         </h1>
         <p className="relative mx-auto mt-6 max-w-xl text-lg leading-relaxed text-inksoft">
-          hiy turns your writing, talks, and videos into a twin that answers
-          the questions you get asked over and over — cited, honest, and ready
-          the moment you&apos;re not. It turns repeat questions into real
-          conversations.
+          hiy learns from what you&apos;ve already written and said, then answers
+          your audience&apos;s repeat questions the way you would — cited, honest,
+          and available while you&apos;re not.
         </p>
         <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link href="/app" className="btn-warm press px-7 py-3.5 text-sm">
@@ -211,11 +210,11 @@ export default function Landing() {
       {/* the product itself — Stripe-style platform mockup */}
       <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
         <h2 className="font-display text-center text-[clamp(1.9rem,3.5vw,2.6rem)] [text-wrap:balance]">
-          The dashboard behind every hiy
+          See every question. Teach every gap.
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-center text-sm text-inksoft">
-          Watch conversations arrive, see what it couldn&apos;t answer, teach it,
-          and publish — from one calm page.
+          Watch conversations arrive, spot what your hiy couldn&apos;t answer,
+          teach it in a click, and publish when it sounds like you.
         </p>
         <div className="mt-10">
           <PlatformMock />
@@ -251,8 +250,12 @@ export default function Landing() {
       {/* more than a chatbot */}
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <h2 className="font-display text-center text-[clamp(2rem,4vw,3rem)]">
-          More than a chatbot
+          An AI that shows its work
         </h2>
+        <p className="mx-auto mt-2 max-w-lg text-center text-sm text-inksoft">
+          Trust is the feature. Every answer is grounded in your real content —
+          and when it isn&apos;t sure, it says so.
+        </p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-12">
           {FEATURED.map((f) => (
             <div

@@ -1,0 +1,35 @@
+# hiy.ai
+
+> hiy.ai turns a creator's existing content — blog posts, YouTube videos, talks, résumés, notes — into a hosted AI twin at hiy.ai/{username}. The twin answers the creator's audience in the creator's own voice, cites the exact source passage behind every grounded answer, and says "I don't know" instead of guessing when a question falls outside the creator's content.
+
+## What makes hiy different
+
+- Passage-level citations: every grounded answer can reveal the exact passage of the creator's real content it came from. Citations are a default, never a paid add-on.
+- Honest by default: when the twin's knowledge doesn't cover a question, it says so, in the creator's tone. Refusing to guess is a designed feature.
+- Voice fidelity: a short personality interview plus the creator's writing style shape how answers are phrased, so the twin sounds like the person, not a generic assistant.
+- Creator control: creators can read everything their twin knows, correct anything it says (corrections override all other content), set off-limits topics, unpublish anytime, and export or delete all their data.
+- Clearly labeled AI: every twin page discloses that it is an AI version of the creator.
+
+## Who it's for
+
+Coaches, consultants, founders, educators, and creators who receive the same questions repeatedly and want their audience answered accurately — with their real positions, cited — even when they're unavailable.
+
+## How it works
+
+1. Feed: paste links, sync a blog via its sitemap, import a YouTube channel, upload PDFs, or paste text.
+2. Learn: hiy builds a cited knowledge base and a voice profile from the material.
+3. Publish: the creator reviews privately, then publishes hiy.ai/{their-name}; an embeddable widget puts the twin on their own site.
+
+## Pricing
+
+Free while launching. Paid tiers (from $19/month) add scale — more training words, embeds, custom branding. Citations and honest answers are never paywalled.
+
+## Key pages
+
+- [Home](https://hiy-kappa.vercel.app/): product overview and instant no-account preview twin
+- [Pricing](https://hiy-kappa.vercel.app/pricing): tiers and frequently asked questions
+
+## Policy notes
+
+- One twin per account; creators may only make a twin of themselves (or someone who gave documented permission).
+- Visitors chat free; conversations are visible to the twin's creator.
